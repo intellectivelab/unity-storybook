@@ -1,0 +1,20 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Templates/Component Factory" />
+
+# Default Component Factory
+
+```jsx
+const DefaultComponentFactory = R.cond([
+	[R.propEq('type', 'grid'), DefaultGridViewFactory],
+	[R.propEq('type', 'criteria'), DefaultCriteriaFactory],
+	[R.propEq('type', 'treeView'), DefaultFolderTreeViewFactory],
+	[R.propEq('type', 'activityFeed'), DefaultActivityFeedFactory],
+	[R.propEq('type', 'searchTemplate'), DefaultSearchTemplateFactory],
+	[R.propEq('type', 'viewTabSearchTemplate'), DefaultViewTabSearchTemplateFactory],
+	[R.propEq('type', 'chart'), DefaultChartFactory],
+	[R.propEq('type', 'indicator'), DefaultIndicatorFactory],
+	[R.propEq('type', 'iframe'), DefaultIframeViewFactory],
+	[R.propEq('type', 'rtfTextEditor'), DefaultRtfEditorFactory],
+]);
+```

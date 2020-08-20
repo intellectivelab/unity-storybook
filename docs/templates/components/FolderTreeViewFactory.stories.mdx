@@ -1,0 +1,17 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Templates/Components/FolderTreeView" />
+
+# Default Folder Tree View Factory
+
+```jsx
+const DefaultFolderTreeViewFactory = (props) => {
+	const {Component = FolderTreeView, _links, ...otherProps} = props;
+
+	const ComposedFolderTreeView = R.compose(withSnackbar, withTreeQueryLoader)(Component);
+
+	return (
+		<ComposedFolderTreeView {...otherProps} browseLink={_links.browse}/>
+	);
+};
+```

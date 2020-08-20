@@ -1,0 +1,17 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Templates/Actions/Copy Case" />
+
+# Copy Case Action
+
+```jsx
+const CopyCaseAction = (props) => withActionView({
+	...props,
+	title: "Copy Case",
+	ViewForm: ResourceCreateWizard,
+	pages: R.map(R.when(R.is(Function), R.call), [CopyCasePropertiesPage, CopyCasePreviewPage, CopyCaseAttachmentsPage]),
+	submitLabel: 'Copy',
+	// model link for Copy Case is link to Create Case;
+	actionLinkFn: (action) => action && getLinkByRel(action._links, 'model') // action link for Copy Case is a model link from Create Case;
+}, () => null);
+```

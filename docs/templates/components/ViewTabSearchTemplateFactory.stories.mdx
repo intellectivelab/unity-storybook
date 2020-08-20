@@ -1,0 +1,27 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Templates/Components/ViewTabSearchTemplate" />
+
+# Default View Search Template Factory
+
+```jsx
+const DefaultViewTabSearchTemplateFactory = props => {
+	const {Component = SearchTemplate, children, ...otherProps} = props;
+
+	const QuickSearchComponent = R.compose(
+		withQuickSearchCriteriaFields,
+		withQuickSearchCategories
+	)(QuickSearch);
+
+	const ComposedComponent = R.compose(withSearchTemplateFormState)(Component);
+
+	return (
+		<ComposedComponent {...otherProps}
+		                   disablePin
+		                   disableRecentHistory
+		                   QuickSearchComponent={QuickSearchComponent}>
+			{children}
+		</ComposedComponent>
+	);
+};
+```

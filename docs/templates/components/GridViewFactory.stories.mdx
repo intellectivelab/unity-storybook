@@ -1,0 +1,53 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Templates/Components/GridView" />
+
+# Default Grid View Factory
+
+```jsx
+const defaultSkimmingViewOptions = {
+	margin: 'dense',
+	toolbarVariant: 'dense',
+	Layout: ColumnsLayout(2)
+};
+
+const defaultGridViewDropSettings = {
+	multiple : true,
+	limit : -1,
+	maxSize : 1024 * 1024 * 20
+};
+
+const withGridViewOnceOverView = withGridViewSkimming(defaultSkimmingViewOptions);
+
+const DefaultGridViewFactory = (props) => {
+
+	const {Component = GridView, QuickSearchComponent = null, children, ...otherProps} = props;
+
+	const ComposedGridView = R.compose(
+		withSnackbar,
+		withGridViewConfigLoader,
+		withGridViewOnceOverView,
+		withGridViewLocalPreferences,
+		withGridViewSettings(defaultGridViewSettings),
+		withGridViewRecentHistory,
+		withGridViewQuickSearch(QuickSearchComponent),
+		withGridViewExportActions,
+		withGridViewDefaultActions,
+		withGridViewModelBulkActions,
+		withGridViewRowActions,
+		withGridViewActionExecutor,
+		withCriteriaStateListener(null),
+		withGridViewQueryLoader,
+		withGridViewSorting,
+		withGridViewSelection,
+		withGridViewPagination,
+		withGridViewDrop(defaultGridViewDropSettings)
+	)(Component);
+
+	return (
+		<ComposedGridView {...otherProps}>
+			{children}
+		</ComposedGridView>
+	);
+};
+```
