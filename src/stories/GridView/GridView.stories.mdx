@@ -1,0 +1,75 @@
+import { Meta, Story, Preview, Props } from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Grid View/README"/>
+
+# Grid View Examples
+
+This page contains description of the GridView customization examples and implementation steps.
+
+<br/>
+
+## Example - Custom toolbar action
+
+This example adds a custom action component into the grid configuration that should be rendered in the grid toolbar.
+
+### Steps
+
+Implement custom component that prints "Hello World" underneath the grid.
+
+```jsx
+const withGridViewPrintAction = R.curry((WrappedGrid, props) => {
+    const {id: gridId, defaultActions = []} = props;
+
+    const [msg, updateMsg] = useState();
+
+    const onRefreshHandler = () => updateMsg("Hello World");
+
+    const _defaultActions = [
+        ...defaultActions,
+        <Tooltip title="Print" key={`${gridId}-print-action`} role="tooltip">
+            <IconButton onClick={onRefreshHandler} role="button" aria-label="Refresh">
+                <Print/>
+            </IconButton>
+        </Tooltip>,
+    ];
+
+    return (
+        <>
+            <WrappedGrid {...props} defaultActions={_defaultActions}/>
+
+            <Typography variant="h1">{msg}</Typography>
+        </>
+    );
+});
+```
+
+Implement a custom factory component for the GridView component where we add the custom action into the compose function.
+
+```jsx
+const GridViewFactory = (props) => {
+
+    const ComposedGridView = R.compose(
+        withGridViewConfigLoader,
+        withGridViewDefaultActions,
+        withGridViewActionExecutor,
+        withCriteriaStateListener(null),
+        withGridViewQueryLoader,
+        withGridViewSorting,
+        withGridViewSelection,
+        withGridViewPagination,
+        withGridViewPrintAction
+    )(GridView);
+
+    return (
+        <ComposedGridView {...props}/>
+    );
+};
+```
+
+Add the mapping condition for the grid view component into the domain component factory referring to the custom factory.
+
+```jsx
+const DomainComponentFactory = R.cond([
+    [R.propEq('type', 'grid'), GridViewFactory],
+]);
+```

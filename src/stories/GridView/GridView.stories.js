@@ -22,11 +22,9 @@ import IconButton from "@material-ui/core/IconButton";
 import Print from "@material-ui/icons/Print";
 import Typography from "@material-ui/core/Typography";
 
-export default {
-	title: 'Examples/Grid View'
-};
+export default {title: 'Examples/Grid View', component: GridView};
 
-export const GridViewWithCustomAction = () => {
+export const CustomToolbarAction = () => {
 
 	/**
 	 * Custom action that prints "Hello World" message below the grid
@@ -57,9 +55,9 @@ export const GridViewWithCustomAction = () => {
 		);
 	});
 
-	/*
+	/**
 	* Custom Grid View factory with the custom action
-	* */
+	*/
 	const GridViewFactory = (props) => {
 
 		const ComposedGridView = R.compose(
