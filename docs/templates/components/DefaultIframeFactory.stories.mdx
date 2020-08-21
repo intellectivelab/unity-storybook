@@ -1,0 +1,18 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Templates/Components/IframeView" />
+
+# Default Iframe View Factory
+
+```jsx
+const DefaultIframeViewFactory = (props) => {
+
+	const {Component = IframeView, ...otherProps} = props;
+
+	const IframeViewComponent = withResponsiveHeight(Component);
+
+	return (
+		<IframeViewComponent {...otherProps}/>
+	);
+};
+```

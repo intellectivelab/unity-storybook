@@ -26,7 +26,7 @@ import {
 	withGridViewSorting
 } from "@intellective/core";
 
-import AppPage from "../../components/StoryPage/AppPage";
+import AppPage from "../../components/AppPage/AppPage";
 
 export default {title: 'Examples/Grid View', component: GridView};
 
@@ -99,6 +99,33 @@ export const CustomToolbarAction = () => {
 	);
 }
 
+const GridViewFactory = (props) => {
+
+	const ComposedGridView = R.compose(
+		withGridViewConfigLoader,
+		withGridViewDefaultActions,
+		withGridViewModelBulkActions,
+		withGridViewActionExecutor,
+		withGridViewQueryLoader,
+		withGridViewSorting,
+		withGridViewSelection,
+		withGridViewPagination,
+	)(GridView);
+
+	return (
+		<ComposedGridView {...props}/>
+	);
+};
+
+const DomainComponentMapper = R.cond([
+	[R.propEq('type', 'grid'), GridViewFactory],
+]);
+
+/**
+ *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
+ */
+const DomainComponentFactory = (props) => DomainComponentMapper(props) || DefaultComponentFactory(props)
+
 /*
 * Add custom form field validator
 */
@@ -122,29 +149,29 @@ export const CustomFormFieldValidation = () => {
 		return validationResult;
 	};
 
-	const customFieldValidators = R.cond([
+	const domainFieldValidators = R.cond([
 		[R.propEq("id", "task_id"), R.always(useAsyncTaskIdValidator)],
 		[R.propEq("id", "case_status"), R.always(useNoValidation)],
 	]);
 
-	const withCustomFieldValidation = withFormFieldValidators(customFieldValidators);
+	const withCustomFieldValidation = withFormFieldValidators(domainFieldValidators);
 
-	const ComposedCreateCaseAction = R.compose(withCustomFieldValidation, CreateCaseWithAttachments);
+	const DomainCreateCaseAction = R.compose(withCustomFieldValidation, CreateCaseWithAttachments);
 
-	const DomainActionMapper = R.curry((settings = {}, action) => {
-		// Add custom actions creation logic here. For example,
+	function DomainActionFactory(defaultSettings = {}) {
+		DefaultActionFactory.call(this, defaultSettings);
 
-		const isCreateAction = R.propEq('type', 'create');
-		const isCaseResource = R.propEq('resourceName', "cases");
-		const isCreateCaseAction = R.allPass([isCreateAction, isCaseResource]);
+		const DomainActionMapper = R.curry((settings = {}, action) => {
+			// Add custom actions creation logic here. For example,
 
-		return R.cond([
-			[isCreateCaseAction, R.always(ComposedCreateCaseAction(settings))],
-		])(action);
-	});
+			const isCreateAction = R.propEq('type', 'create');
+			const isCaseResource = R.propEq('resourceName', "cases");
+			const isCreateCaseAction = R.allPass([isCreateAction, isCaseResource]);
 
-	function ActionFactory(defaultSettings = {}) {
-		DefaultActionFactory.call(this);
+			return R.cond([
+				[isCreateCaseAction, R.always(DomainCreateCaseAction(settings))],
+			])(action);
+		});
 
 		this.createAction = R.curry((action, props) => {
 			const {settings = {}, ...otherProps} = props;
@@ -155,44 +182,12 @@ export const CustomFormFieldValidation = () => {
 
 			return <ActionComponent {...otherProps} {...action} action={action}/>;
 		});
-
-		this.getFormSubmitHandler = DefaultFormSubmitHandlerMapper;
 	}
-
-	/**
-	 * Custom Grid View factory with the custom action
-	 */
-	const GridViewFactory = (props) => {
-
-		const ComposedGridView = R.compose(
-			withGridViewConfigLoader,
-			withGridViewDefaultActions,
-			withGridViewModelBulkActions,
-			withGridViewActionExecutor,
-			withGridViewQueryLoader,
-			withGridViewSorting,
-			withGridViewSelection,
-			withGridViewPagination,
-		)(GridView);
-
-		return (
-			<ComposedGridView {...props}/>
-		);
-	};
-
-	const DomainComponentFactory = R.cond([
-		[R.propEq('type', 'grid'), GridViewFactory],
-	]);
-
-	/**
-	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
-	 */
-	const ComponentFactory = (props) => DomainComponentFactory(props) || DefaultComponentFactory(props)
 
 	return (
 		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
-		         ActionFactory={ActionFactory}
-		         ComponentFactory={ComponentFactory}
+		         ActionFactory={DomainActionFactory}
+		         ComponentFactory={DomainComponentFactory}
 		/>
 	);
 };
@@ -206,7 +201,7 @@ export const CustomFormSubmitHandler = () => {
 	const isCaseResource = R.propEq('resourceName', "cases");
 	const isCreateCaseAction = R.allPass([isCreateAction, isCaseResource]);
 
-	const CustomCreateCaseSubmitHandler = R.pipe(
+	const DomainCreateCaseSubmitHandler = R.pipe(
 		(props) => {
 			const {data} = props;
 
@@ -221,51 +216,20 @@ export const CustomFormSubmitHandler = () => {
 		R.andThen(DefaultCreateCaseSubmitHandler)
 	);
 
-	const DomainFormSubmitHandlerMapper = R.cond([
-		[isCreateCaseAction, R.always(CustomCreateCaseSubmitHandler)],
-	]);
+	function DomainActionFactory(defaultSettings = {}) {
+		DefaultActionFactory.call(this, defaultSettings);
 
-	function ActionFactory(defaultSettings = {}) {
-		DefaultActionFactory.call(this);
+		const DomainFormSubmitHandlerMapper = R.cond([
+			[isCreateCaseAction, R.always(DomainCreateCaseSubmitHandler)],
+		]);
 
 		this.getFormSubmitHandler = (props) => DomainFormSubmitHandlerMapper(props) || DefaultFormSubmitHandlerMapper(props);
 	}
 
-	/**
-	 * Custom Grid View factory with the custom action
-	 */
-	const GridViewFactory = (props) => {
-
-		const ComposedGridView = R.compose(
-			withGridViewConfigLoader,
-			withGridViewDefaultActions,
-			withGridViewModelBulkActions,
-			withGridViewActionExecutor,
-			withGridViewQueryLoader,
-			withGridViewSorting,
-			withGridViewSelection,
-			withGridViewPagination,
-		)(GridView);
-
-		return (
-			<ComposedGridView {...props}/>
-		);
-	};
-
-	const DomainComponentFactory = R.cond([
-		[R.propEq('type', 'grid'), GridViewFactory],
-	]);
-
-	/**
-	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
-	 */
-	const ComponentFactory = (props) => DomainComponentFactory(props) || DefaultComponentFactory(props)
-
 	return (
 		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
-		         ActionFactory={ActionFactory}
-		         ComponentFactory={ComponentFactory}
+		         ActionFactory={DomainActionFactory}
+		         ComponentFactory={DomainComponentFactory}
 		/>
 	);
-
 };
