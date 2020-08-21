@@ -78,16 +78,16 @@ export const CustomToolbarAction = () => {
 		);
 	};
 
-	const DomainComponentFactory = R.cond([
+	const DomainComponentMapping = R.cond([
 		[R.propEq('type', 'grid'), GridViewFactory],
 	]);
 
 	/**
 	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
 	 */
-	const ComponentFactory = (props) => DomainComponentFactory(props) || DefaultComponentFactory(props)
+	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
 
 	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1" ComponentFactory={ComponentFactory}/>
+		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1" ComponentFactory={DomainComponentFactory}/>
 	);
 }

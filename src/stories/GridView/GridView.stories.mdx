@@ -4,13 +4,13 @@ import { Meta, Story, Preview, Props } from '@storybook/addon-docs/blocks';
 
 # Grid View Examples
 
-This page contains description of the GridView customization examples and implementation steps.
+This page provides various examples of customizing the GridView component.
 
 <br/>
 
 ## Example - Custom toolbar action
 
-This example adds a custom action component into the grid configuration that should be rendered in the grid toolbar.
+This example shows how to add a custom action component into the gridView configuration that rendered in the grid toolbar.
 
 ### Steps
 
@@ -66,10 +66,16 @@ const GridViewFactory = (props) => {
 };
 ```
 
-Add the mapping condition for the grid view component into the domain component factory referring to the custom factory.
+Create mapping conditions for the domain components.
 
 ```jsx
-const DomainComponentFactory = R.cond([
+const DomainComponentMapping = R.cond([
     [R.propEq('type', 'grid'), GridViewFactory],
 ]);
+```
+
+Implement the domain component factory in the way that the domain component mapping comes first.
+
+```jsx
+const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
 ```
