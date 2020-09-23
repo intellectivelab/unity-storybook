@@ -1,4 +1,4 @@
-import { Meta, Story, Preview, Props } from '@storybook/addon-docs/blocks';
+import {Meta} from '@storybook/addon-docs/blocks';
 
 <Meta title="Examples/Form Validation/README"/>
 
@@ -47,7 +47,7 @@ const domainFieldValidators = R.cond([
     [R.propEq("id", "case_status"), R.always(() => ({error: false}))],
 ]);
 
-const withCustomFieldValidation = withFormFieldValidators(domainFieldValidators);
+const withCustomFieldValidation = withDomainFormFieldValidation(domainFieldValidators);
 ```
 
 Extend the default create case action with the custom validators.
