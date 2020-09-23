@@ -2,8 +2,6 @@ import React from 'react';
 
 import {DefaultPageBuilder, resolveBuilder, useConfigLoader} from "@intellective/core"
 
-import withPageResponsiveStyles from "./withPageResponsiveStyles";
-
 const PageContainer = props => {
 	const {href, ...otherProps} = props;
 
@@ -18,4 +16,4 @@ const PageContainer = props => {
 	return PageBuilder && <PageBuilder {...otherProps} {...config}/>;
 };
 
-export default withPageResponsiveStyles(PageContainer);
+export default PageContainer;

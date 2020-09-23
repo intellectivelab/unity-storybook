@@ -1,6 +1,6 @@
 {
   "name": "unity-ui-storybook",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "server": "node server",
@@ -8,25 +8,25 @@
     "build-storybook": "build-storybook -s public"
   },
   "dependencies": {
-    "@intellective/core": "2020.1.1-alpha.58",
+    "@intellective/core": "2020.1.1-alpha.64",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
-    "@material-ui/core": "latest",
-    "@material-ui/icons": "latest",
-    "@material-ui/lab": "latest",
-    "@material-ui/styles": "latest",
-    "@mdi/js": "latest",
-    "prop-types": "latest",
-    "ramda": "latest",
+    "@material-ui/core": "^4.11.0",
+    "@material-ui/icons": "^4.9.1",
+    "@material-ui/lab": "^4.0.0-alpha.56",
+    "@material-ui/styles": "^4.10.0",
+    "@mdi/js": "^5.6.55",
+    "prop-types": "^15.7.2",
+    "ramda": "^0.27.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-redux": "latest",
-    "react-router-dom": "latest",
-    "react-router-redux": "latest",
+    "react-redux": "^7.2.1",
+    "react-router-dom": "^5.2.0",
+    "react-router-redux": "^4.0.8",
     "react-scripts": "3.4.3",
-    "redux": "latest",
-    "redux-thunk": "latest"
+    "redux": "^4.0.5",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.11.1",

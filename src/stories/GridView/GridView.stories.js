@@ -9,13 +9,15 @@ import Typography from "@material-ui/core/Typography";
 
 import {
 	DefaultComponentFactory,
+	defaultGridViewSettings,
 	GridView,
 	withGridViewActionExecutor,
 	withGridViewConfigLoader,
-	withGridViewDefaultActions,
+	withGridViewDefaultActions, withGridViewModelBulkActions,
 	withGridViewPagination,
 	withGridViewQueryLoader,
 	withGridViewSelection,
+	withGridViewSettings,
 	withGridViewSorting
 } from "@intellective/core";
 
@@ -64,7 +66,9 @@ export const CustomToolbarAction = () => {
 
 		const ComposedGridView = R.compose(
 			withGridViewConfigLoader,
+			withGridViewSettings(defaultGridViewSettings),
 			withGridViewDefaultActions,
+			withGridViewModelBulkActions,
 			withGridViewActionExecutor,
 			withGridViewQueryLoader,
 			withGridViewSorting,

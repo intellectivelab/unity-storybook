@@ -4,23 +4,29 @@ import * as R from "ramda";
 
 import {useDispatch, useSelector} from "react-redux";
 
+import Alert from "@material-ui/lab/Alert";
+import CreateIcon from "@material-ui/icons/Create";
+import Typography from "@material-ui/core/Typography";
+
 import AppPage from "../../components/AppPage/AppPage";
 
 import {
 	CreateCaseAttachmentsPage,
 	CreateCasePreviewPage,
-	CreateCaseViewForm,
 	CreateCaseWithAttachments,
 	DefaultActionFactory,
 	DefaultActionMapper,
 	DefaultComponentFactory,
 	DefaultCreateCaseSubmitHandler,
 	DefaultFormSubmitHandlerMapper,
+	defaultGridViewSettings,
+	DefaultViewForm,
+	forms,
 	GridView,
 	ResourceCreateViewTitle,
 	ResourceCreateWizard,
 	withActionView,
-	withFormFieldValidators,
+	withDomainFormFieldValidation,
 	withGridViewActionExecutor,
 	withGridViewConfigLoader,
 	withGridViewDefaultActions,
@@ -28,20 +34,20 @@ import {
 	withGridViewPagination,
 	withGridViewQueryLoader,
 	withGridViewSelection,
-	withGridViewSorting
+	withGridViewSettings,
+	withGridViewSorting,
+	withResourceDataLoader
 } from "@intellective/core";
 
-import CreateIcon from "@material-ui/icons/Create";
-import Alert from "@material-ui/lab/Alert";
-import {updateFormFieldValidation} from "@intellective/core/build/store/actions/forms";
-import {Typography} from "@material-ui/core";
-
 export default {title: 'Examples/Form Validation'};
+
+const CreateCaseViewForm = R.compose(withResourceDataLoader)(DefaultViewForm);
 
 const GridViewFactory = (props) => {
 
 	const ComposedGridView = R.compose(
 		withGridViewConfigLoader,
+		withGridViewSettings(defaultGridViewSettings),
 		withGridViewDefaultActions,
 		withGridViewModelBulkActions,
 		withGridViewActionExecutor,
@@ -93,7 +99,7 @@ export const CustomFormFieldValidation = () => {
 		[R.propEq("id", "case_status"), R.always(useNoValidation)],
 	]);
 
-	const withCustomFieldValidation = withFormFieldValidators(domainFieldValidators);
+	const withCustomFieldValidation = withDomainFormFieldValidation(domainFieldValidators);
 
 	const DomainCreateCaseAction = R.compose(withCustomFieldValidation, CreateCaseWithAttachments);
 
@@ -173,6 +179,9 @@ export const CustomFormSubmitHandler = () => {
 	);
 };
 
+/*
+ * Custom Form Validation Status
+*/
 export const CustomFormValidationComponent = () => {
 
 	const DomainFormValidationStatus = props => {
@@ -195,9 +204,9 @@ export const CustomFormValidationComponent = () => {
 			}
 
 			if (taskIdValue === null) {
-				dispatch(updateFormFieldValidation(formId, "task_id", false));
+				dispatch(forms.updateFieldValidation(formId, "task_id", false));
 			} else {
-				dispatch(updateFormFieldValidation(formId, "task_id", Number(taskIdValue) !== 0, "TaskId must be equal to 0"));
+				dispatch(forms.updateFieldValidation(formId, "task_id", Number(taskIdValue) !== 0, "TaskId must be equal to 0"));
 			}
 		}, [taskIdValue]);
 
