@@ -750,7 +750,16 @@ module.exports = {
             {
                 "name": "assigned_to_name",
                 "label": "Assigned To",
-                "dataType": "string",
+                "dataType": "lookup",
+                "lookupId": "usersLookup",
+                "_links": {
+                    "lookup": {
+                        "href": '/api/config/components/usersLookup'
+                    },
+                    "lookupData": {
+                        "href": '/api/config/components/usersLookup/data?id={id}'
+                    }
+                },
                 "width": 100,
                 "tooltip": "Assigned To"
             }
@@ -892,15 +901,34 @@ module.exports = {
                 "width": 100,
                 "tooltip": "Note",
                 "maxLength": 10,
-                "minLength": 2
+                "minLength": 2,
+                "colSpan": 2
             },
             {
                 "name": "assigned_to_name",
                 "label": "Assigned To",
-                "dataType": "string",
+                "dataType": "lookup",
+                "lookupId": "usersLookup",
+                "linkedFieldId": "assignee_address",
+                "_links": {
+                    "lookup": {
+                        "href": '/api/config/components/usersLookup'
+                    },
+                    "lookupData": {
+                        "href": '/api/config/components/usersLookup/data?id={id}'
+                    }
+                },
                 "width": 100,
                 "tooltip": "Assigned To"
-            }
+            },
+
+            {
+                "name": "assignee_address",
+                "label": "Assignee Address",
+                "dataType": "string",
+                "width": 100,
+                "tooltip": "Assignee Address"
+            },
         ],
         "sections": [],
         "_links": {

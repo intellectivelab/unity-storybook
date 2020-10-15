@@ -45,6 +45,8 @@ const CreateCaseViewForm = R.compose(withResourceDataLoader)(DefaultViewForm);
 
 const GridViewFactory = (props) => {
 
+	const {Component = GridView} = props;
+
 	const ComposedGridView = R.compose(
 		withGridViewConfigLoader,
 		withGridViewSettings(defaultGridViewSettings),
@@ -55,7 +57,7 @@ const GridViewFactory = (props) => {
 		withGridViewSorting,
 		withGridViewSelection,
 		withGridViewPagination,
-	)(GridView);
+	)(Component);
 
 	return (
 		<ComposedGridView {...props}/>

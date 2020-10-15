@@ -8,7 +8,7 @@ export default (props) => {
 	const {href, ...otherProps} = props;
 
 	return (
-		<DefaultThemeProvider paletteName="connecticut">
+		<DefaultThemeProvider paletteName="charcoal">
 			<FactoryContextProvider {...otherProps}>
 				<PageContainer href={href}/>
 			</FactoryContextProvider>

@@ -1,4 +1,45 @@
 module.exports = {
+
+    "usersLookup": {
+        "id": "usersLookup",
+        "type": "SearchTemplate",
+        "searchTemplateId": "usersSearch0",
+        "idField": "id",
+        "labelField": "fullName",
+        "_links": {
+            "self": {
+                "href": "/api/config/components/usersLookup",
+                "type": "application/json"
+            },
+            "config": {
+                "href": "/api/config/components/usersSearchForLookup",
+                "type": "application/json"
+            }
+        }
+    },
+    "usersSearchForLookup": {
+        "id": "usersSearchForLookup",
+        "title": "Users Search for Lookup",
+        "_links": {
+            "self": {
+                "href": "/api/config/components/usersSearchForLookup",
+                "type": "application/json"
+            },
+            "criteria": {
+                "href": "/api/config/components/usersSearchCriteria",
+                "type": "application/json"
+            },
+            "grid": {
+                "href": "/api/config/components/users",
+                "type": "application/json"
+            },
+            "query": {
+                "href": "/api/users/query",
+                "type": "application/json"
+            },
+        }
+    },
+
     "usersSearch": [
         {
             "id": "usersSearch0",
