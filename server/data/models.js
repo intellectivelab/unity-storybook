@@ -381,7 +381,6 @@ module.exports = {
                 "label": "Assigned To",
                 "dataType": "string",
                 "multiValue": false,
-                "defaultValue": "San Jose",
                 "readOnly": false,
                 "hidden": false,
                 "filterable": true,
