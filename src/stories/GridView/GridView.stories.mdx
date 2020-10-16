@@ -79,3 +79,89 @@ Implement the domain component factory in the way that the domain component mapp
 ```jsx
 const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
 ```
+
+<br/>
+
+## Example - Custom column renderer
+
+This example shows how to customize a Grid View component with adding a custom column rendering logic.
+
+### Steps
+
+Implement function for custom rendering value for a domain specific columns.
+In the below snippet Material UI Alert component used as an example.
+
+```jsx
+	const renderStatus = R.curry((column, value) => {
+		const {name} = column;
+		const isCaseStatus = "case_status" === name;
+		const severity = R.cond([
+			[R.equals("Open"), R.always("info")],
+			[R.equals("Error"), R.always("error")],
+			[R.equals("Close"), R.always("success")],
+			[R.T, R.always("warning")],
+		])(value);
+
+		const icon = isCaseStatus ? {icon: false} : {};
+		return <Alert variant={isCaseStatus ? "filled" : "outlined"} severity={severity} {...icon}>{value}</Alert>;
+	});
+```
+
+Implement a custom renderer function.
+
+```jsx
+	const domainStatusColumnRenderer = (value, row, column) => renderStatus(column, value);
+```
+
+Implement extension (HOC) for the grid that apply the custom renderer for a domain columns.
+
+```jsx
+	const withDomainColumnRendering = R.curry((WrappedGrid, props) => {
+		const {columns = []} = props;
+		const isDomainColumn = R.anyPass([R.propEq('name', 'case_status'), R.propEq('name', 'task_status')]);
+		const domainStatusColumnMapper = R.when(isDomainColumn, column => ({
+			...column,
+			renderer: domainStatusColumnRenderer
+		}));
+		const _columns = R.map(domainStatusColumnMapper, columns);
+
+		return <WrappedGrid {...props} columns={_columns}/>;
+	});
+```
+
+Implement a custom factory component for the GridView component where we add withDomainColumnRendering HOC.
+
+```jsx
+const GridViewFactory = (props) => {
+
+    const ComposedGridView = R.compose(
+        withGridViewConfigLoader,
+        withGridViewDefaultActions,
+        withGridViewActionExecutor,
+        withCriteriaStateListener(null),
+        withGridViewQueryLoader,
+        withGridViewSorting,
+        withGridViewSelection,
+        withGridViewPagination,
+        withDomainColumnRendering
+    )(GridView);
+
+    return (
+        <ComposedGridView {...props}/>
+    );
+};
+```
+
+Create mapping conditions for the domain components.
+
+```jsx
+const DomainComponentMapping = R.cond([
+    [R.propEq('type', 'grid'), GridViewFactory],
+]);
+```
+
+Implement the domain component factory in the way that the domain component mapping comes first.
+
+```jsx
+const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+```
