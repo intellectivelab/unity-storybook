@@ -762,7 +762,15 @@ module.exports = {
                 },
                 "width": 100,
                 "tooltip": "Assigned To"
+            },
+            {
+                "name": "assignee_address",
+                "label": "Assignee Address",
+                "dataType": "string",
+                "width": 100,
+                "tooltip": "Assignee Address"
             }
+
         ],
         "sections": [{
             "title": "SLA",

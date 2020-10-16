@@ -8,7 +8,7 @@
     "build-storybook": "build-storybook -s public"
   },
   "dependencies": {
-    "@intellective/core": "2020.1.1-alpha.67",
+    "@intellective/core": "2020.1.1-alpha.69",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",

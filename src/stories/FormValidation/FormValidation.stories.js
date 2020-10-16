@@ -133,7 +133,7 @@ export const CustomFormFieldValidation = () => {
 
 	return (
 		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
-		         ActionFactory={DomainActionFactory}
+		         ActionFactory={new DomainActionFactory()}
 		         ComponentFactory={DomainComponentFactory}
 		/>
 	);
@@ -175,7 +175,7 @@ export const CustomFormSubmitHandler = () => {
 
 	return (
 		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
-		         ActionFactory={DomainActionFactory}
+		         ActionFactory={new DomainActionFactory()}
 		         ComponentFactory={DomainComponentFactory}
 		/>
 	);
@@ -277,7 +277,7 @@ export const CustomFormValidationComponent = () => {
 
 	return (
 		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
-		         ActionFactory={DomainActionFactory}
+		         ActionFactory={new DomainActionFactory()}
 		         ComponentFactory={DomainComponentFactory}
 		/>
 	);

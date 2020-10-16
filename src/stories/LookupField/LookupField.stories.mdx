@@ -46,88 +46,25 @@ const withSelectionHandler = R.curry((formId, fieldId, WrappedField, props) => {
 });
 ```
 
-Create an extension (HOC) for the ViewForm component to extend the lookup field with withSelectionHandler HOC.
+Implement a Factory to build a custom Lookup Form Field.
 
 ```jsx
-const withCustomFormFieldMapper = R.curry((WrappedForm, props) => {
+const UsersLookupFieldFactory = (props) => {
 	const {formId} = props;
 	const linkedFieldId = "assignee_address";
-
-	const {FieldComponent = FormField, ...otherProps} = props;
-
-	const withCustomFieldMapper = R.curry((WrappedField, props) => {
-		const {lookupId} = props;
-
-		const UsersLookupField = useMemo(() => R.compose(withSelectionHandler(formId, linkedFieldId))(LookupField), []);
-
-		const domainFormFieldMapper = R.cond([
-		    [() => "usersLookup" === lookupId,  R.always(UsersLookupField)],
-			[R.T, useDefaultFormFieldMapper]
-		]);
-
-		return <WrappedField {...props} fieldMapper={domainFormFieldMapper} />
-	});
-
-
-	const _FieldComponent = withCustomFieldMapper(FieldComponent);
-
-	return <WrappedForm FieldComponent={_FieldComponent} {...otherProps} />
-});
-```
-
-Extend the default view form component with the custom form field mapper.
-
-```jsx
-const CreateCaseViewForm = R.compose(withResourceDataLoader, withCustomFormFieldMapper)(DefaultViewForm);
-```
-
-Create a page with the custom form field mapper.
-```jsx
-const DomainCreateCasePropertiesPage = {
-    label: 'Fill in details',
-    icon: CreateIcon,
-    view: CreateCaseViewForm
+	return R.compose(withSelectionHandler(formId, linkedFieldId))(LookupField);
 };
 ```
 
-Extend the default create case action with the custom form field mapper.
-
+Create mapping conditions for the domain form fields.
 ```jsx
-const DomainCreateCaseAction = (props) => withActionView({
-    ...props,
-    title: <ResourceCreateViewTitle resourceName="Case"/>,
-    ViewForm: ResourceCreateWizard,
-    pages: [DomainCreateCasePropertiesPage, CreateCasePreviewPage, CreateCaseAttachmentsPage],
-    submitLabel: 'Create Case'
-}, () => null);
-
-
-const DomainActionMapper = R.curry((settings = {}, action) => {
-    // Add custom actions creation logic here. For example,
-
-    const isCreateAction = R.propEq('type', 'create');
-    const isCaseResource = R.propEq('resourceName', "cases");
-    const isCreateCaseAction = R.allPass([isCreateAction, isCaseResource]);
-
-    return R.cond([
-        [isCreateCaseAction, R.always(DomainCreateCaseAction(settings))],
-    ])(action);
-});
+const DomainFieldMapper = R.cond([
+	[R.propEq('lookupId', 'usersLookup'), UsersLookupFieldFactory],
+]);
 ```
-Implement the domain action factory.
+
+Implement the domain form field factory in the way that the domain form fields mapping comes first.
 
 ```jsx
-function DomainActionFactory(defaultSettings = {}) {
-    DefaultActionFactory.call(this, defaultSettings);
-
-    this.createAction = R.curry((action, props) => {
-        const {settings = {}, ...otherProps} = props;
-
-        const {view: viewSettings = {}} = settings;
-
-        const ActionComponent = DomainActionMapper({...defaultSettings, ...viewSettings}, action) || DefaultActionMapper({...defaultSettings, ...viewSettings}, action);
-
-        return <ActionComponent {...otherProps} {...action} action={action}/>;
-    });
-}
+const DomainFormFieldFactory = (props) => DomainFieldMapper(props) || DefaultFormFieldFactory(props)
 ```
