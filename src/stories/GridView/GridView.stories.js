@@ -2,9 +2,10 @@ import React, {useState} from 'react';
 
 import * as R from "ramda";
 
-import Tooltip from "@material-ui/core/Tooltip";
+import Alert from "@material-ui/lab/Alert";
 import IconButton from "@material-ui/core/IconButton";
 import Print from "@material-ui/icons/Print";
+import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 
 import {
@@ -13,7 +14,8 @@ import {
 	GridView,
 	withGridViewActionExecutor,
 	withGridViewConfigLoader,
-	withGridViewDefaultActions, withGridViewModelBulkActions,
+	withGridViewDefaultActions,
+	withGridViewModelBulkActions,
 	withGridViewPagination,
 	withGridViewQueryLoader,
 	withGridViewSelection,
@@ -92,6 +94,90 @@ export const CustomToolbarAction = () => {
 	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
 
 	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1" ComponentFactory={DomainComponentFactory}/>
+		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1"
+				 ComponentFactory={DomainComponentFactory}/>
+	);
+};
+
+/*
+* Add custom column renderer
+*/
+export const CustomColumnRendering = () => {
+
+	const mapValue = R.cond([
+		[R.is(Array), R.map(R.when(R.is(Object), R.prop('value')))],
+		[R.is(Object), R.prop('value')],
+		[R.T, R.identity]
+	]);
+
+	const renderStatus = R.curry((column, value) => {
+		const {name} = column;
+
+		if (value === undefined || value === null || value === '') {
+			return null;
+		}
+
+		const isCaseStatus = "case_status" === name;
+
+		const severity = R.cond([
+			[R.equals("Open"), R.always("info")],
+			[R.equals("Error"), R.always("error")],
+			[R.equals("Close"), R.always("success")],
+			[R.T, R.always("warning")],
+		])(value);
+
+		const icon = isCaseStatus ? {icon: false} : {};
+		return <Alert variant={isCaseStatus ? "filled" : "outlined"} severity={severity} {...icon}>{value}</Alert>;
+	});
+
+	const domainStatusColumnRenderer = (value, row, column) => R.compose(renderStatus(column), mapValue)(value);
+
+	const withDomainColumnRendering = R.curry((WrappedGrid, props) => {
+		const {columns = []} = props;
+		const isDomainColumn = R.anyPass([R.propEq('name', 'case_status'), R.propEq('name', 'task_status')]);
+		const domainStatusColumnMapper = R.when(isDomainColumn, column => ({
+			...column,
+			renderer: domainStatusColumnRenderer
+		}));
+		const _columns = R.map(domainStatusColumnMapper, columns);
+
+		return <WrappedGrid {...props} columns={_columns}/>;
+	});
+
+	/**
+	 * Custom Grid View factory with the custom column renderer addition
+	 */
+	const GridViewFactory = (props) => {
+		const ComposedGridView = R.compose(
+			withGridViewConfigLoader,
+			withGridViewSettings(defaultGridViewSettings),
+			withGridViewDefaultActions,
+			withGridViewModelBulkActions,
+			withGridViewActionExecutor,
+			withGridViewQueryLoader,
+			withGridViewSorting,
+			withGridViewSelection,
+			withGridViewPagination,
+			withDomainColumnRendering
+		)(GridView);
+
+		return (
+			<ComposedGridView {...props}/>
+		);
+	};
+
+	const DomainComponentMapping = R.cond([
+		[R.propEq('type', 'grid'), GridViewFactory],
+	]);
+
+	/**
+	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
+	 */
+	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+
+	return (
+		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+				 ComponentFactory={DomainComponentFactory}/>
 	);
 }
+
