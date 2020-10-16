@@ -76,7 +76,7 @@ const DomainComponentFactory = (props) => DomainComponentMapper(props) || Defaul
 /*
 * Add custom form field validator
 */
-export const CustomFormFieldValidation = () => {
+export const UsingFormFieldValidation = () => {
 
 	const useNoValidation = () => ({error: false});
 
@@ -142,7 +142,7 @@ export const CustomFormFieldValidation = () => {
 /*
 * Inject custom form submit handler logic
 */
-export const CustomFormSubmitHandler = () => {
+export const UsingFormSubmitHandler = () => {
 
 	const isCreateAction = R.propEq('type', 'create');
 	const isCaseResource = R.propEq('resourceName', "cases");
@@ -184,7 +184,7 @@ export const CustomFormSubmitHandler = () => {
 /*
  * Custom Form Validation Status
 */
-export const CustomFormValidationComponent = () => {
+export const UsingFormValidation = () => {
 
 	const DomainFormValidationStatus = props => {
 		const {formId} = props;

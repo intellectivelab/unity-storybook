@@ -30,7 +30,7 @@ export default {title: 'Examples/Grid View'};
 /*
 * Add custom toolbar action to the grid component
 */
-export const CustomToolbarAction = () => {
+export const UsingToolbarAction = () => {
 
 	/**
 	 * Custom action that prints "Hello World" message below the grid
@@ -95,14 +95,14 @@ export const CustomToolbarAction = () => {
 
 	return (
 		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1"
-				 ComponentFactory={DomainComponentFactory}/>
+		         ComponentFactory={DomainComponentFactory}/>
 	);
 };
 
 /*
 * Add custom column renderer
 */
-export const CustomColumnRendering = () => {
+export const UsingColumnRendering = () => {
 
 	const mapValue = R.cond([
 		[R.is(Array), R.map(R.when(R.is(Object), R.prop('value')))],
@@ -127,6 +127,7 @@ export const CustomColumnRendering = () => {
 		])(value);
 
 		const icon = isCaseStatus ? {icon: false} : {};
+
 		return <Alert variant={isCaseStatus ? "filled" : "outlined"} severity={severity} {...icon}>{value}</Alert>;
 	});
 
@@ -134,12 +135,15 @@ export const CustomColumnRendering = () => {
 
 	const withDomainColumnRendering = R.curry((WrappedGrid, props) => {
 		const {columns = []} = props;
-		const isDomainColumn = R.anyPass([R.propEq('name', 'case_status'), R.propEq('name', 'task_status')]);
-		const domainStatusColumnMapper = R.when(isDomainColumn, column => ({
+
+		const isCaseStatusColumn = R.anyPass([R.propEq('name', 'case_status'), R.propEq('name', 'task_status')]);
+
+		const customStatusColumn = R.when(isCaseStatusColumn, column => ({
 			...column,
 			renderer: domainStatusColumnRenderer
 		}));
-		const _columns = R.map(domainStatusColumnMapper, columns);
+
+		const _columns = R.map(customStatusColumn, columns);
 
 		return <WrappedGrid {...props} columns={_columns}/>;
 	});
@@ -177,7 +181,7 @@ export const CustomColumnRendering = () => {
 
 	return (
 		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
-				 ComponentFactory={DomainComponentFactory}/>
+		         ComponentFactory={DomainComponentFactory}/>
 	);
 }
 
