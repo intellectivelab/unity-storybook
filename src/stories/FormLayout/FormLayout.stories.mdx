@@ -1,0 +1,79 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Form Layout/README"/>
+
+# Form Layout Examples
+
+This page provides various examples of customizing the default form layout.
+
+<br/>
+
+## Example - Default column layout
+
+This example shows how to change Default Column Layout by providing a custom configuration.
+
+### Steps
+
+Define a configuration will be used as a new default values for any type of form.
+
+**Note**
+This config is almost identical to the one defined in @intellective/core modules except Layout which is TwoColumnsLayout by default
+
+```jsx
+const customConfig = {
+    variant: 'dialog',
+    fullScreen: true,
+    maxWidth: 'xl',
+    innerMaxWidth: 'lg',
+    margin: 'dense',
+    Layout: ThreeColumnsLayout
+};
+```
+
+Implement the domain action mapper where you can additionally tune the layout for specific actions.
+
+```jsx
+const DomainActionMapper = R.curry((settings = {}, action) => {
+
+    // Add custom actions creation logic here. For example,
+    const isCreateAction = R.propEq('type', 'create');
+    const isCaseResource = R.propEq('resourceName', "cases");
+    const isCreateCaseAction = R.allPass([isCreateAction, isCaseResource]);
+
+    return R.cond([
+        [isCreateCaseAction, R.always(CreateCaseWithAttachments({
+            ...settings,
+            //Using custom configuration settings
+            variant: 'sidebar',
+            fullScreen: false,
+            Layout: OneColumnLayout
+        }))],
+    ])(action);
+});
+```
+
+Implement the domain action factory and apply the DomainActionMapper.
+
+```jsx
+function DomainActionFactory(defaultSettings = {}) {
+    DefaultActionFactory.call(this, defaultSettings);
+
+    this.createAction = R.curry((action, props) => {
+        const {settings = {}, ...otherProps} = props;
+
+        const {view: viewSettings = {}} = settings;
+
+        const ActionComponent = DomainActionMapper({...defaultSettings, ...viewSettings}, action) || DefaultActionMapper({...defaultSettings, ...viewSettings}, action);
+
+        return <ActionComponent {...otherProps} {...action} action={action}/>;
+    });
+
+}
+```
+
+Pass custom configuration into the DomainActionFactory.
+
+```jsx
+const ActionFactory = new DomainActionFactory(customConfig);
+```
+

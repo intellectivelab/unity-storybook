@@ -1,0 +1,34 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Templates/Form Field Factory" />
+
+# Default Form Field Factory
+
+```jsx
+const DefaultFormFieldFactory =  R.cond([
+	[F.isRtfTextField, R.always(RtfTextField)],
+	[F.isRtfEditorField, R.always(RtfEditorField)],
+	[F.isStringField, R.always(AutocompleteField)],
+	[F.isTextField, R.always(TextAreaField)],
+	[F.isBooleanField, R.always(withFormControlLabel(Switch))],
+	[F.isNumericField, R.always(NumericField)],
+	[F.isDateField, R.always(withDateFieldAdornment(KeyboardDatePicker, DEFAULT_DATE_FORMAT))],
+	[F.isDateTimeField, R.always(withDateFieldAdornment(KeyboardDateTimePicker, DEFAULT_DATETIME_FORMAT))],
+	[F.isDateRangeField, R.always(DateRangeField)],
+	[F.isCheckboxField, R.always(withFormControlLabel(Checkbox))],
+	[F.isToggleField, R.always(withFormControlLabel(Switch))],
+	[F.isRadioField, R.always(withFormControlLabel(Radio))],
+	[F.isPasswordField, R.always(PasswordField)],
+	[F.isEmailField, R.always(EmailField)],
+	[F.isUrlField, R.always(UrlField)],
+	[F.isChoicesField, R.always(Choices)],
+	[F.isLookupField, R.always(LookupField)],
+	[F.isStaticSelectorField, R.always(StaticSelector)],
+	[F.isAsyncSelectorField, R.always(AsyncSelector)],
+	[F.isTermsFacetField, R.always(FieldStatistics)],
+	[F.isRangeFacetField, R.always(RangeField)],
+	[F.isFileUploadField, R.always(FileUploadField)],
+	[F.isFolderPickerField, R.always(FolderPickerField)],
+	[F.isTableField, R.always(TableField)]
+]);
+```
