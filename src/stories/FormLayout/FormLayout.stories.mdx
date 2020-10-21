@@ -17,7 +17,7 @@ This example shows how to change Default Column Layout by providing a custom con
 Define a configuration will be used as a new default values for any type of form.
 
 **Note**
-This config is almost identical to the one defined in @intellective/core modules except Layout which is TwoColumnsLayout by default
+In this example we are changing Layout value only from default TwoColumnsLayout to ThreeColumnsLayout
 
 ```jsx
 const customConfig = {
@@ -31,6 +31,8 @@ const customConfig = {
 ```
 
 Implement the domain action mapper where you can additionally tune the layout for specific actions.
+**Note**
+In this example we are changing Layout value to OneColumnsLayout and ViewForm variant from default 'dialog' to 'sidebar' for Create Case Action only
 
 ```jsx
 const DomainActionMapper = R.curry((settings = {}, action) => {
