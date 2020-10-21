@@ -12,21 +12,27 @@ import {
     ThreeColumnsLayout
 } from "@intellective/core";
 
-export default {title: 'Examples/Form Layout'};
+import Grid from "@material-ui/core/Grid";
+import Paper from "@material-ui/core/Paper";
+import {Typography} from "@material-ui/core";
 
-const customConfig = {
-    variant: 'dialog',
-    fullScreen: true,
-    maxWidth: 'xl',
-    innerMaxWidth: 'lg',
-    margin: 'dense',
-    Layout: ThreeColumnsLayout
-};
+import {makeStyles} from "@material-ui/core/styles";
+
+export default {title: 'Examples/Form Layout'};
 
 /*
 * Using Default Column Layout with custom configuration
 */
 export const UsingDefaultColumnLayout = () => {
+
+    const customConfig = {
+        variant: 'dialog',
+        fullScreen: true,
+        maxWidth: 'xl',
+        innerMaxWidth: 'lg',
+        margin: 'dense',
+        Layout: ThreeColumnsLayout
+    };
 
     function DomainActionFactory(defaultSettings = {}) {
         DefaultActionFactory.call(this, defaultSettings);
@@ -64,3 +70,68 @@ export const UsingDefaultColumnLayout = () => {
                     ActionFactory={new DomainActionFactory(customConfig)}/>;
 };
 
+/*
+* Using Custom Form Layout
+*/
+export const UsingCustomFormLayout = () => {
+
+    const useStyles = makeStyles((theme) => ({
+        root: {
+            flexGrow: 1,
+        },
+        paper: {
+            padding: theme.spacing(2),
+            margin: 'auto',
+            maxWidth: 1000,
+        },
+        row: {
+            padding: theme.spacing(2),
+            borderColor: theme.palette.action.active,
+            borderBottom: 'inset',
+
+        }
+    }));
+
+    const CustomFormLayout = (props) => {
+
+        const {children} = props;
+        const classes = useStyles();
+
+        const rows = R.splitEvery(2, React.Children.toArray(children));
+
+        return (
+            <div className={classes.root}>
+                <Paper className={classes.paper}>
+                    <Grid container direction="column" alignItems="center">
+                        <Grid item>
+                            <Typography variant="h2" gutterBottom>Custom Form Layout</Typography>
+                        </Grid>
+                        <Grid item xs={12} sm container>
+                            {rows.map((row, rowIdx) => (<Grid className={classes.row}
+                                                             container
+                                                             direction="row"
+                                                             justify="space-between"
+                                                             alignItems="center"
+                                                             key={rowIdx}>
+                                    {row.map((child, idx) => (
+                                        <Grid item xs={4} key={`${rowIdx}-${idx}`}>{child}</Grid>))}
+                                </Grid>)
+                            )}
+                        </Grid>
+                    </Grid>
+                </Paper>
+            </div>
+        );
+    };
+    const customConfig = {
+        variant: 'dialog',
+        fullScreen: true,
+        maxWidth: 'xl',
+        innerMaxWidth: 'lg',
+        margin: 'dense',
+        Layout: CustomFormLayout
+    };
+
+    return <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+                    ActionFactory={new DefaultActionFactory(customConfig)}/>;
+};

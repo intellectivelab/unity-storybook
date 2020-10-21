@@ -8,7 +8,7 @@ This page provides various examples of customizing the default form layout.
 
 <br/>
 
-## Example - Default column layout
+## Example - Default Form Column Layout
 
 This example shows how to change Default Column Layout by providing a custom configuration.
 
@@ -77,5 +77,69 @@ Pass custom configuration into the DomainActionFactory.
 
 ```jsx
 const ActionFactory = new DomainActionFactory(customConfig);
+```
+
+## Example - Custom Form Layout
+
+This example shows how to implement and use Custom Form Layout.
+
+### Steps
+
+Implement Custom Layout as a functional component.
+**Note**
+Form view content passed to the component within props.
+
+```jsx
+const CustomFormLayout = (props) => {
+
+    const {children} = props;
+    const classes = useStyles();
+
+    //in this example we just split every 2 fields into the row and render rows inside custom grid
+    const rows = R.splitEvery(2, React.Children.toArray(children));
+
+    return (
+        <div className={classes.root}>
+            <Paper className={classes.paper}>
+                <Grid container direction="column" alignItems="center">
+                    <Grid item>
+                        <Typography variant="h2" gutterBottom>Custom Form Layout</Typography>
+                    </Grid>
+                    <Grid item xs={12} sm container>
+                        {rows.map((row, rowIdx) => (<Grid className={classes.row}
+                                                         container
+                                                         direction="row"
+                                                         justify="space-between"
+                                                         alignItems="center"
+                                                         key={rowIdx}>
+                                {row.map((child, idx) => (
+                                    <Grid item xs={4} key={`${rowIdx}-${idx}`}>{child}</Grid>))}
+                            </Grid>)
+                        )}
+                    </Grid>
+                </Grid>
+            </Paper>
+        </div>
+    );
+};
+```
+
+Define a configuration with the CustomFormLayout as Layout.
+
+```jsx
+    const customConfig = {
+        variant: 'dialog',
+        fullScreen: true,
+        maxWidth: 'xl',
+        innerMaxWidth: 'lg',
+        margin: 'dense',
+        Layout: CustomFormLayout
+    };
+```
+
+And pass custom configuration into the ActionFactory.
+
+```jsx
+const ActionFactory = new DefaultActionFactory(customConfig);
 ```
 
