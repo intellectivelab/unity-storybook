@@ -1,0 +1,74 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Form Field/README"/>
+
+# Form Field Usage Example
+
+This page provides various examples of using and customizing the Form Field component.
+
+<br/>
+
+## Example - Custom form field adornment
+
+This example shows how to add a custom URL form field adornment that opens the entered url in a new browser tab.
+
+### Steps
+
+Create an extension (HOC) for the URL Field component that adds custom field adornment.
+Adornment can be added both to the beginning (`startAdornment`) and to the end (`endAdornment`) of the form field.
+
+```jsx
+const withCustomFieldAdornment = R.curry((formId, WrappedField, props) => {
+
+    const {id, value: url, InputProps = {}} = props;
+
+    const formSelector = useSelector(({forms}) => (forms[formId]));
+
+    const formState = (formSelector && formSelector.data) || {};
+
+    const invalid = R.defaultTo(false)(R.path([id, "invalid"], formState));
+
+    const onClickHandler = () => {
+        window.open(url, "_blank");
+    };
+
+    const endAdornment = url && !invalid && (
+        <InputAdornment position="end">
+            <Tooltip title="Open in a new browser tab" role="tooltip">
+                <IconButton size="small"
+                            role="button"
+                            aria-label="Open"
+                            onClick={onClickHandler}>
+                    <OpenInNewIcon/>
+                </IconButton>
+            </Tooltip>
+        </InputAdornment>
+    );
+
+    return <WrappedField {...props} InputProps={{...InputProps, endAdornment}}/>;
+});
+```
+
+Implement a Factory to build a custom URL Form Field.
+
+```jsx
+const UsersUrlFieldFactory = (props) => {
+    const {formId} = props;
+
+    return withCustomFieldAdornment(formId, UrlField);
+};
+```
+
+Create mapping conditions for the domain form fields.
+
+```jsx
+const DomainFieldMapper = R.cond([
+    [R.propEq("ui", "usersUrl"), UsersUrlFieldFactory],
+]);
+```
+
+Implement the domain form field factory in the way that the domain form fields mapping comes first.
+
+```jsx
+const DomainFormFieldFactory = (props) => DomainFieldMapper(props) || DefaultFormFieldFactory(props);
+```
