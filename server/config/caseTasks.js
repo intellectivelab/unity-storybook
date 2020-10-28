@@ -960,6 +960,13 @@ module.exports = {
                 "width": 100,
                 "tooltip": "Website",
                 "defaultValue": "http://www.intellective.com"
+            },
+            {
+                "name": "rating",
+                "label": "Rating",
+                "dataType": "integer",
+                "ui": "rating",
+                "defaultValue": 0
             }
         ],
         "sections": [],
