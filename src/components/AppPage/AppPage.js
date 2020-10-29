@@ -6,15 +6,15 @@ import {HashRouter as Router} from "react-router-dom";
 import PageContainer from "./PageContainer";
 
 export default (props) => {
-	const {href, ...otherProps} = props;
+	const {href, ThemeProvider = DefaultThemeProvider, ...otherProps} = props;
 
 	return (
-		<DefaultThemeProvider paletteName="charcoal">
+		<ThemeProvider>
 			<FactoryContextProvider {...otherProps}>
 				<Router>
 					<PageContainer href={href}/>
 				</Router>
 			</FactoryContextProvider>
-		</DefaultThemeProvider>
+		</ThemeProvider>
 	);
 };
