@@ -72,3 +72,49 @@ Implement the domain form field factory in the way that the domain form fields m
 ```jsx
 const DomainFormFieldFactory = (props) => DomainFieldMapper(props) || DefaultFormFieldFactory(props);
 ```
+
+
+## Example - Custom form field
+
+This example shows how to add a custom form field based on [Material UI Rating component](https://material-ui.com/components/rating/)
+
+### Steps
+
+Implement custom component that shows rating for a given numeric value. The properties below are used by the component:
+
+| prop | Description |
+|:----|:-------------------|
+| id        |  Comes from field configuration, used as rating component name |
+| label     |  Comes from field configuration, used to render FormLabel |
+| value     |  Initially comes from configuration as default value, then after any field change new value will be passed via props |
+| onChange  |  Typically onChange is a handler responsible for updating the field value in form redux state |
+
+
+```jsx
+const RatingField = props => {
+
+    const {id, label, margin = "dense", value, onChange} = props;
+
+    const handleChange = (event, newValue) => {
+        onChange && onChange(newValue);
+    };
+
+    return (
+        <FormControl margin={margin} fullWidth component="div">
+            <FormLabel component="label">{label}</FormLabel>
+
+            <Rating name={id} value={value} onChange={handleChange}/>
+        </FormControl>
+    );
+};
+```
+
+Implement a Factory to build a custom Rating Form Field or use default factory for others.
+
+```jsx
+    const DomainFormFieldFactory = (props) => R.ifElse(
+        R.propEq("ui", "rating"),
+        R.always(RatingField),
+        DefaultFormFieldFactory
+    )(props);
+```
