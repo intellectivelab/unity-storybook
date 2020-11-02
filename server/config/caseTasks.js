@@ -769,8 +769,16 @@ module.exports = {
                 "dataType": "string",
                 "width": 100,
                 "tooltip": "Assignee Address"
+            },
+            {
+                "name": "website",
+                "label": "Website",
+                "dataType": "url",
+                "ui": "usersUrl",
+                "width": 100,
+                "tooltip": "Website",
+                "defaultValue": "http://www.intellective.com"
             }
-
         ],
         "sections": [{
             "title": "SLA",
@@ -937,6 +945,15 @@ module.exports = {
                 "width": 100,
                 "tooltip": "Assignee Address"
             },
+            {
+                "name": "website",
+                "label": "Website",
+                "dataType": "url",
+                "ui": "usersUrl",
+                "width": 100,
+                "tooltip": "Website",
+                "defaultValue": "http://www.intellective.com"
+            }
         ],
         "sections": [],
         "_links": {
