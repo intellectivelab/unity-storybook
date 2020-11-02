@@ -573,6 +573,67 @@ module.exports = [
 					},
 				}
 			},
+            {
+                "id": "page13",
+                "title": "Process Analytics",
+                "tooltip": "Process Analytics",
+                "lazy": true,
+                "builder": 'custom',
+                "components": [
+                    {
+                        "id": "SLAByWeek",
+                        "type": "chart",
+                        "_links": {
+                            "config": {
+                                "href": "/api/config/components/SLAByWeek"
+                            }
+                        }
+                    },
+                    {
+                        "id": "AvgCaseTypeDuration",
+                        "type": "chart",
+                        "_links": {
+                            "config": {
+                                "href": "/api/config/components/AvgCaseTypeDuration"
+                            }
+                        }
+                    },
+                    {
+                        "id": "RegionCaseType",
+                        "type": "chart",
+                        "_links": {
+                            "config": {
+                                "href": "/api/config/components/RegionCaseType"
+                            }
+                        }
+                    },
+                    {
+                        "id": "casetasks",
+                        "type": "grid",
+                        "_links": {
+                            "config": {
+                                "href": "/api/config/components/casetasks"
+                            },
+                            "query": {
+                                "href": "/api/casetasks/query",
+                                "type": "application/json"
+                            },
+                            "list": {
+                                "href": "/api/casetasks/list",
+                                "type": "application/json"
+                            }
+                        }
+                    },
+                ],
+                "_links": {
+                    "self": {
+                        "href": "/api/config/perspectives/search/dashboards/page13"
+                    },
+                    "actions": {
+                        "href": "/api/config/perspectives/search/dashboards/dashboard/actions"
+                    },
+                }
+            },
 			{
 				"id": "page10",
 				"title": "External Content",
