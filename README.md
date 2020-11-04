@@ -35,8 +35,14 @@ Download and install nodejs - https://nodejs.org/en/download/
 
 ## Use the storybook
 
-Clone the repository and run the following commands sequentially one-by-one:
+Clone the repository and run `yarn install` in the root folder to install required dependencies.
 
-* yarn install
+Start using the storybook by running the following commands:
+
 * yarn server
 * yarn storybook
+
+For more information, please refer to:
+
+- [Storybook](https://storybook.js.org) - What storybook is.
+- [Getting started](https://storybook.js.org/docs/react/get-started/introduction) - Introduction to Storybook for React.
