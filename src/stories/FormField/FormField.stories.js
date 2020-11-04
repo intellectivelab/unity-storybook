@@ -13,90 +13,86 @@ import Tooltip from "@material-ui/core/Tooltip";
 
 import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 
-import AppPage from "../../components/AppPage/AppPage";
 import {DefaultFormFieldFactory, UrlField} from "@intellective/core";
+
+import AppPage from "../../components/AppPage/AppPage";
 
 export default {title: "Examples/Form Field"};
 
-/*
- * Custom Form Field Adornment
-*/
-const withCustomFieldAdornment = R.curry((formId, WrappedField, props) => {
+export const UsingRatingField = () => {
 
-    const {id, value: url, InputProps = {}} = props;
+	/*
+	 * Rating Form Field
+	*/
+	const RatingField = props => {
 
-    const formSelector = useSelector(({forms}) => (forms[formId]));
+		const {id, label, margin = "dense", value, onChange} = props;
 
-    const formState = (formSelector && formSelector.data) || {};
+		const handleChange = (event, newValue) => {
+			onChange && onChange(newValue);
+		};
 
-    const invalid = R.defaultTo(false)(R.path([id, "invalid"], formState));
+		return (
+			<FormControl margin={margin} fullWidth component="div">
+				<FormLabel component="label">{label}</FormLabel>
 
-    const onClickHandler = () => {
-        window.open(url, "_blank");
-    };
+				<Rating name={id} value={value} onChange={handleChange}/>
+			</FormControl>
+		);
+	};
 
-    const endAdornment = url && !invalid && (
-        <InputAdornment position="end">
-            <Tooltip title="Open in a new browser tab" role="tooltip">
-                <IconButton size="small"
-                            role="button"
-                            aria-label="Open"
-                            onClick={onClickHandler}>
-                    <OpenInNewIcon/>
-                </IconButton>
-            </Tooltip>
-        </InputAdornment>
-    );
+	const DomainFormFieldFactory = (props) => R.ifElse(
+		R.propEq("ui", "rating"),
+		R.always(RatingField),
+		DefaultFormFieldFactory
+	)(props);
 
-    return <WrappedField {...props} InputProps={{...InputProps, endAdornment}}/>;
-});
-
-const UsersUrlFieldFactory = (props) => {
-    const {formId} = props;
-
-    return withCustomFieldAdornment(formId, UrlField);
-};
-
-export const UsingFormFieldAdornment = () => {
-
-    const DomainFieldMapper = R.cond([
-        [R.propEq("ui", "usersUrl"), UsersUrlFieldFactory],
-    ]);
-
-    const DomainFormFieldFactory = (props) => DomainFieldMapper(props) || DefaultFormFieldFactory(props);
-
-    return <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
-                    FormFieldFactory={DomainFormFieldFactory}/>;
+	return <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+	                FormFieldFactory={DomainFormFieldFactory}/>;
 }
 
-/*
- * Custom Form Field
-*/
-const RatingField = props => {
+const withOpenBrowserTabAdornment = R.curry((formId, WrappedField, props) => {
 
-    const {id, label, margin = "dense", value, onChange} = props;
+	const {id, value: url, InputProps = {}} = props;
 
-    const handleChange = (event, newValue) => {
-        onChange && onChange(newValue);
-    };
+	const formState = useSelector(R.pathOr({}, ["forms", formId, "data"]));
 
-    return (
-        <FormControl margin={margin} fullWidth component="div">
-            <FormLabel component="label">{label}</FormLabel>
+	const invalid = R.defaultTo(false)(R.path([id, "invalid"], formState));
 
-            <Rating name={id} value={value} onChange={handleChange}/>
-        </FormControl>
-    );
-};
+	const onClickHandler = () => {
+		window.open(url, "_blank");
+	};
 
-export const UsingCustomFormField = () => {
+	const endAdornment = url && !invalid && (
+		<InputAdornment position="end">
+			<Tooltip title="Open in a new browser tab" role="tooltip">
+				<IconButton size="small"
+				            role="button"
+				            aria-label="Open"
+				            onClick={onClickHandler}>
+					<OpenInNewIcon/>
+				</IconButton>
+			</Tooltip>
+		</InputAdornment>
+	);
 
-    const DomainFormFieldFactory = (props) => R.ifElse(
-        R.propEq("ui", "rating"),
-        R.always(RatingField),
-        DefaultFormFieldFactory
-    )(props);
+	return <WrappedField {...props} InputProps={{...InputProps, endAdornment}}/>;
+});
 
-    return <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
-                    FormFieldFactory={DomainFormFieldFactory}/>;
+export const UsingFieldAdornment = () => {
+
+	const UsersUrlFieldFactory = (props) => {
+		const {formId} = props;
+
+		return withOpenBrowserTabAdornment(formId, UrlField);
+	};
+
+	const DomainFieldMapper = R.cond([
+		[R.propEq("ui", "usersUrl"), UsersUrlFieldFactory],
+	]);
+
+	const DomainFormFieldFactory = (props) => DomainFieldMapper(props) || DefaultFormFieldFactory(props);
+
+	return <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+	                FormFieldFactory={DomainFormFieldFactory}/>;
 }

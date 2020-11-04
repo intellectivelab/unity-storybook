@@ -92,35 +92,32 @@ Form view content passed to the component within props.
 ```jsx
 const CustomFormLayout = (props) => {
 
-    const {children} = props;
-    const classes = useStyles();
+	const classes = useStyles();
 
-    //in this example we just split every 2 fields into the row and render rows inside custom grid
-    const rows = R.splitEvery(2, React.Children.toArray(children));
+	const {children} = props;
 
-    return (
-        <div className={classes.root}>
-            <Paper className={classes.paper}>
-                <Grid container direction="column" alignItems="center">
-                    <Grid item>
-                        <Typography variant="h2" gutterBottom>Custom Form Layout</Typography>
-                    </Grid>
-                    <Grid item xs={12} sm container>
-                        {rows.map((row, rowIdx) => (<Grid className={classes.row}
-                                                         container
-                                                         direction="row"
-                                                         justify="space-between"
-                                                         alignItems="center"
-                                                         key={rowIdx}>
-                                {row.map((child, idx) => (
-                                    <Grid item xs={4} key={`${rowIdx}-${idx}`}>{child}</Grid>))}
-                            </Grid>)
-                        )}
-                    </Grid>
-                </Grid>
-            </Paper>
-        </div>
-    );
+	const rows = R.splitEvery(2, React.Children.toArray(children));
+
+	return (
+		<div className={classes.root}>
+			<Grid container spacing={1}>
+				{rows.map((row, rowIdx) => (
+					<Grid key={rowIdx}
+					      className={classes.row}
+					      item
+					      container
+					      direction="row"
+					      justify="space-between"
+					      alignItems="center"
+					>
+						{row.map((child, idx) => (
+							<Grid item xs={4} key={`${rowIdx}-${idx}`}>{child}</Grid>
+						))}
+					</Grid>)
+				)}
+			</Grid>
+		</div>
+	);
 };
 ```
 
