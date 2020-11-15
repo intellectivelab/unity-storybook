@@ -4,17 +4,24 @@ import * as R from "ramda";
 
 import {
     DefaultComponentFactory,
+    withChartConfigLoader,
+    DefaultChartContainer
 } from "@intellective/core";
-
-import DefaultChartContainer from '@intellective/core/build/containers/DefaultChartContainer/DefaultChartContainer'
-import withChartConfigLoader from '@intellective/core/build/containers/DefaultChartContainer/withChartConfigLoader'
 
 import AppPage from "../../components/AppPage/AppPage";
 import Tooltip from "@material-ui/core/Tooltip";
 
 export default {title: 'Examples/Chart Ticks'};
 
+/*
+* Improve default charts with custom tickFormat
+*/
+
 export const ChartTickFormat = () => {
+
+    /**
+     * Custom formatter for x-axis for ticks to become in checkerboard order
+     */
 
     const withCheckerboardTickFormat = R.curry((WrappedChart, props) => {
 
@@ -43,6 +50,10 @@ export const ChartTickFormat = () => {
         return <WrappedChart {...props} chartTickFormat={tickFormat}/>;
     });
 
+    /**
+     * Custom formatter for y-axis to display tooltip with additional info on hover
+     */
+
     const withTooltipTickFormat = R.curry((WrappedChart, props) => {
 
         const scaledTickFormat = scaleRate => v => (v * scaleRate).toFixed();
@@ -70,12 +81,20 @@ export const ChartTickFormat = () => {
         return <WrappedChart {...props} chartTickFormat={tickFormat}/>;
     });
 
-    const checkPropType = R.curry((typeDeclared, Result, WrappedChart, props) =>
-        R.propEq('type', typeDeclared)(props) ? Result(WrappedChart, props) : <WrappedChart {...props}/>
-    );
+    /**
+     * Custom Chart factory with the custom formats
+     */
 
     const CustomChartFactory = (props) => {
         const {Component = DefaultChartContainer, ...otherProps} = props;
+
+        /**
+         * Chart type check function to use format with charts with certain type
+         */
+
+        const checkPropType = R.curry((typeDeclared, Result, WrappedChart, props) =>
+            R.propEq('type', typeDeclared)(props) ? Result(WrappedChart, props) : <WrappedChart {...props}/>
+        );
 
         const Chart = R.compose(
             withChartConfigLoader,
@@ -91,6 +110,10 @@ export const ChartTickFormat = () => {
     const DomainComponentMapping = R.cond([
         [R.propEq('type', 'chart'), CustomChartFactory]
     ]);
+
+    /**
+     *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
+     */
 
     const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
 
