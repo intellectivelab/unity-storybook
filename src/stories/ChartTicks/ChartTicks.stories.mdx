@@ -1,0 +1,115 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Chart Ticks/README"/>
+
+# Chart Ticks Examples
+
+This page provides various examples of customizing ticks of the Chart component.
+
+<br/>
+
+## Example - Custom chart tick formats
+
+This example shows how to customize chart ticks.
+
+### Steps
+
+Implement custom tick formats.
+
+withCheckerboardTickFormat creates checkerboard order for ticks on x-axis.
+
+```jsx
+    const withCheckerboardTickFormat = R.curry((WrappedChart, props) => {
+
+        const scaledTickFormat = scaleRate => v => (v * scaleRate).toFixed();
+
+        const checkerBoardFormat = R.curry((formatValue, value, index) => {
+            const formattedValue = formatValue(0, value);
+
+            const odd = index % 2 !== 0;
+
+            return <>
+                {odd && <line x1="0" x2="0" y1="-6" y2="30" className="rv-xy-plot__axis__tick__line"/>}
+                <text className='rv-xy-plot__axis__tick__text' transform="translate(0, 14)" textAnchor="middle"
+                      dy='0.72em'>
+                    <tspan y={odd ? '25' : '0'}>{formattedValue}</tspan>
+                </text>
+            </>;
+
+        });
+
+        const tickFormat = formatValue => ({
+            mainAxisTickFormatHandler: checkerBoardFormat(formatValue),
+            scaleTicksHandler: scaledTickFormat
+        });
+
+        return <WrappedChart {...props} chartTickFormat={tickFormat}/>;
+    });
+```
+
+withTooltipTickFormat uses tooltip to improve a lack of displayed data.
+
+```jsx
+    const withTooltipTickFormat = R.curry((WrappedChart, props) => {
+
+        const scaledTickFormat = scaleRate => v => (v * scaleRate).toFixed();
+
+        const tooltipFormat = R.curry((length, formatValue, value) => {
+            const formattedValue = formatValue(0, value);
+
+            return formattedValue.length > length ?
+                <Tooltip title={formattedValue} aria-label={formattedValue} placement='right'>
+                    <text textAnchor="end" dy="0.32em" transform="translate(-14, 0)"
+                          className="rv-xy-plot__axis__tick__text">
+                        <tspan>
+                            {formattedValue.substring(0, length)}...
+                        </tspan>
+                    </text>
+                </Tooltip> : formattedValue;
+
+        });
+
+        const tickFormat = formatValue => ({
+            mainAxisTickFormatHandler: tooltipFormat(6)(formatValue),
+            scaleTicksHandler: scaledTickFormat
+        });
+
+        return <WrappedChart {...props} chartTickFormat={tickFormat}/>;
+    });
+```
+
+Implement a custom factory component for the DefaultChartContainer component where we add the custom action into the compose function.
+
+```jsx
+    const CustomChartFactory = (props) => {
+        const {Component = DefaultChartContainer, ...otherProps} = props;
+
+        const checkPropType = R.curry((typeDeclared, Result, WrappedChart, props) =>
+            R.propEq('type', typeDeclared)(props) ? Result(WrappedChart, props) : <WrappedChart {...props}/>
+        );
+
+        const Chart = R.compose(
+            withChartConfigLoader,
+            checkPropType('vComposite')(withCheckerboardTickFormat),
+            checkPropType('hComposite')(withTooltipTickFormat)
+        )(Component);
+
+        return (
+            <Chart {...otherProps} />
+        );
+    };
+```
+
+Create mapping conditions for the domain components.
+
+```jsx
+    const DomainComponentMapping = R.cond([
+        [R.propEq('type', 'chart'), CustomChartFactory]
+    ]);
+```
+
+Implement the domain component factory in the way that the domain component mapping comes first.
+
+```jsx
+    const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+```
