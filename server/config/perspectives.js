@@ -681,6 +681,43 @@ module.exports = [
 					}
 				}
 			},
+
+			{
+				"id": "ticks_page",
+				"title": "Chart ticks customization",
+				"tooltip": "SLA",
+				"lazy": true,
+				"builder": 'dashboard',
+				"components": [
+
+					{
+						"id": "TasksByRegion",
+						"type": "chart",
+						"_links": {
+							"config": {
+								"href": "/api/config/components/TasksByRegion"
+							}
+						}
+					},
+					{
+						"id": "TaskNamesByStartDate",
+						"type": "chart",
+						"_links": {
+							"config": {
+								"href": "/api/config/components/TaskNamesByStartDate"
+							}
+						}
+					},
+				],
+				"_links": {
+					"self": {
+						"href": "/api/config/perspectives/search/dashboards/ticks_page"
+					},
+					"actions": {
+						"href": "/api/config/perspectives/search/dashboards/dashboard/actions"
+					},
+				}
+			},
 		],
 		"_links": {
 			"self": {

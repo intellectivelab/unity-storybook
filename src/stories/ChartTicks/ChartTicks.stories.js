@@ -115,10 +115,12 @@ export const ChartTickFormat = () => {
      *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
      */
 
-    const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+
+    const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props);
 
     return (
-        <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page6"
+        <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/ticks_page"
                  ComponentFactory={DomainComponentFactory}/>
     );
 };
+
