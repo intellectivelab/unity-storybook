@@ -50,6 +50,34 @@ module.exports = [
 					}
 				}
 			},
+			{
+				"id": "page8",
+				"title": "Folders View",
+				"tooltip": "Showcase of using search template and folders",
+				"components": [
+					{
+						"id": "DocumentSearchTemplate",
+						"type": "searchTemplate",
+						"folderPath": "/",
+						"_links": {
+							"config": {
+								"href": "/api/config/components/DocumentSearchTemplate"
+							},
+							"browse": {
+								"href": "/api/folders/browse?scope=ce_repository&root=/&offset=0&limit=20"
+							}
+						}
+					},
+				],
+				"_links": {
+					"self": {
+						"href": "/api/config/perspectives/search/dashboards/page8"
+					},
+					"actions": {
+						"href": "/api/config/perspectives/search/dashboards/page8/actions"
+					}
+				}
+			},
             {
                 "id": "page13",
                 "title": "Process Analytics",
