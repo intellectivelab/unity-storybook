@@ -1,4 +1,4 @@
-import React, {useState, useMemo} from 'react';
+import React, {useState} from 'react';
 
 import {useDispatch} from "react-redux";
 
@@ -10,8 +10,6 @@ import Print from "@material-ui/icons/Print";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import TableCell from "@material-ui/core/TableCell";
-import TableRow from "@material-ui/core/TableRow";
-import TableBody from "@material-ui/core/TableBody";
 
 import {
 	DefaultComponentFactory,
@@ -22,11 +20,10 @@ import {
 	withGridViewDefaultActions,
 	withGridViewModelBulkActions,
 	withGridViewPagination,
-	withGridViewQueryLoader,
+	withGridViewDataLoader,
 	withGridViewSelection,
 	withGridViewSettings,
 	withGridViewSorting,
-	Checkbox,
 } from "@intellective/core";
 
 import AppPage from "../../components/AppPage/AppPage";
@@ -78,7 +75,7 @@ export const UsingToolbarAction = () => {
 			withGridViewDefaultActions,
 			withGridViewModelBulkActions,
 			withGridViewActionExecutor,
-			withGridViewQueryLoader,
+			withGridViewDataLoader,
 			withGridViewSorting,
 			withGridViewSelection,
 			withGridViewPagination,
@@ -164,7 +161,7 @@ export const UsingColumnRendering = () => {
 			withGridViewDefaultActions,
 			withGridViewModelBulkActions,
 			withGridViewActionExecutor,
-			withGridViewQueryLoader,
+			withGridViewDataLoader,
 			withGridViewSorting,
 			withGridViewSelection,
 			withGridViewPagination,
@@ -203,120 +200,33 @@ export const UsingDoubleClickHandler = () => {
 		id, currentAction
 	});
 
-	const useCellRenderer = R.curry((classes, row, column) => {
-		if (React.isValidElement(column)) {
+	const withUseCustomCellRenderer = R.curry((WrappedGrid, props) => {
+		const {id, actions} = props;
+
+		const action = R.find(R.propEq("name", "view"), actions);
+
+		const useCustomCellRenderer = R.curry((classes, row, column) => {
+			if (React.isValidElement(column)) {
+				return (
+					<TableCell key={`${row.id}-${column.props.name}`} className={classes.tableCell} scope="row" variant="body">
+						{React.cloneElement(column, {row})}
+					</TableCell>
+				);
+			}
+
+			const value = row[column.name];
+
+			// eslint-disable-next-line react-hooks/rules-of-hooks
+			const dispatch = useDispatch();
+
 			return (
-				<TableCell key={`${row.id}-${column.props.name}`} className={classes.tableCell} scope="row" variant="body">
-					{React.cloneElement(column, {row})}
+				<TableCell onDoubleClick={() => dispatch(updateGridCurrentAction(id, {action, selected: row}))} key={`${row.id}-${column.name}`} className={classes.tableCell} scope="row" variant="body">
+					{column.renderer ? column.renderer(value, row, column) : value}
 				</TableCell>
 			);
-		}
+		});
 
-		const value = row[column.name];
-
-		const numeric = R.anyPass([
-			R.propEq('dataType', 'int'),
-			R.propEq('dataType', 'long'),
-			R.propEq('dataType', 'number'),
-			R.propEq('dataType', 'float')
-		])(column);
-
-		return (
-			<TableCell key={`${row.id}-${column.name}`} className={classes.tableCell} scope="row" variant="body" align={numeric ? 'right' : 'left'}>
-				{column.renderer ? column.renderer(value, row, column) : value}
-			</TableCell>
-		);
-	});
-
-	const CustomTableRowRenderer = (props) => {
-		const {classes, columns, data, checked, disabled, enableSelection, onRowSelect, onRowDoubleClickAction} = props;
-
-		const cellRenderer = useCellRenderer(classes, data);
-
-		return (
-			<TableRow aria-checked={checked} role="row" hover selected={checked} tabIndex={-1} onDoubleClick={() => onRowDoubleClickAction?.(data)}>
-				{enableSelection &&
-				<TableCell className={classes.tableCell} padding="checkbox">
-					<Checkbox checked={checked}
-							  disabled={disabled}
-							  inputProps={{'aria-label': ' checkbox-' + data.id}}
-							  onChange={() => onRowSelect && onRowSelect(data)}/>
-				</TableCell>}
-
-				{useMemo(() => R.addIndex(R.map)(cellRenderer, columns), [data, columns])}
-			</TableRow>
-		);
-	};
-
-	const TableRowContainer = (props) => {
-		const {classes, idx, columns, data, checked, disabled, enableSelection, selected, onRowSelect, onRowDoubleClickAction, TableRowRenderer = CustomTableRowRenderer} = props;
-
-		return useMemo(() => (
-			<TableRowRenderer idx={idx}
-							  classes={classes}
-							  columns={columns}
-							  data={data}
-							  checked={checked}
-							  disabled={disabled}
-							  enableSelection={enableSelection}
-							  onRowSelect={onRowSelect}
-							  onRowDoubleClickAction={onRowDoubleClickAction}
-			/>
-		), [idx, columns, checked, disabled, data, enableSelection, selected, onRowDoubleClickAction]);
-	};
-
-	const CustomTableBodyRenderer = (props) => {
-		const {
-			id: tableId,
-			records = [],
-			classes,
-			columns,
-			selected,
-			enableSelection,
-			onCheckPreselected,
-			onRowSelect,
-			TableRowRenderer,
-			onRowDoubleClickAction
-		} = props;
-
-		const dispatch = useDispatch();
-
-		return (
-			<TableBody>
-				{R.addIndex(R.map)((record, idx) => {
-					const disabled = onCheckPreselected && onCheckPreselected(record.id);
-					const checked = disabled || (selected && selected.some(s => s.id === record.id));
-
-					return (
-						<TableRowContainer key={`${record.id}-${idx}`}
-										   idx={idx}
-										   tableId={tableId}
-										   classes={classes}
-										   columns={columns}
-										   checked={checked}
-										   disabled={disabled}
-										   data={record}
-										   enableSelection={enableSelection}
-										   selected={selected}
-										   onRowSelect={onRowSelect}
-										   TableRowRenderer={TableRowRenderer}
-										   onRowDoubleClickAction={onRowDoubleClickAction && R.compose(dispatch, onRowDoubleClickAction)}
-						/>
-					);
-				}, records)}
-			</TableBody>
-		);
-	};
-
-	/**
-	 * Custom withRowDoubleClickHandler which takes actionName as an argument and searches for it in array with existing actions
-	 */
-	const withRowDoubleClickHandler = R.curry((actionName, WrappedGrid, props) => {
-		const {id, actions} = props;
-		const action = R.find(R.propEq("name", actionName), actions);
-
-		return <WrappedGrid {...props} TableBodyRenderer={CustomTableBodyRenderer}
-					 onRowDoubleClickAction={action ? selected => updateGridCurrentAction(id, {action, selected}) : undefined}/>;
+		return <WrappedGrid {...props} useCellRenderer={useCustomCellRenderer}/>;
 	});
 
 	/**
@@ -329,11 +239,11 @@ export const UsingDoubleClickHandler = () => {
 			withGridViewDefaultActions,
 			withGridViewModelBulkActions,
 			withGridViewActionExecutor,
-			withGridViewQueryLoader,
+			withGridViewDataLoader,
 			withGridViewSorting,
 			withGridViewSelection,
 			withGridViewPagination,
-			withRowDoubleClickHandler("view")
+			withUseCustomCellRenderer
 		)(GridView);
 
 		return (
