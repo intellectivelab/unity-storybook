@@ -198,7 +198,7 @@ export const UsingCustomColumnAction = () => {
 	 */
 	const withCustomColumnActionType = R.curry((WrappedGrid, props) => {
 
-		const customActionRendererRenderer = () => () => {
+		const customActionRenderer = R.curry((config, props, column) => {
 
 			return (value, record, column) => {
 				const handleClick = (event) => {
@@ -211,11 +211,11 @@ export const UsingCustomColumnAction = () => {
 					<GetAppIcon cursor='pointer' color="inherit" onClick={handleClick}/>
 				</Tooltip>;
 			};
-		};
+		});
 
 		const columnMapper = (props, config) => {
 			const tryCustomActionRenderer = R.cond([
-				[(column) => column.name === 'customActionType', customActionRendererRenderer(config, props)],
+				[(column) => column.name === 'customActionType', customActionRenderer(config, props)],
 			]);
 
 			const useColumnActionType = R.cond([[R.propEq('dataType', 'customActionType'), R.always('download')]]);
@@ -232,13 +232,43 @@ export const UsingCustomColumnAction = () => {
 		return <WrappedGrid {...props} columnMapper={columnMapper} />;
 	});
 
+	const withCustomConfig = R.curry((WrappedGrid, props) => {
+
+
+			const customActionRenderer= (value, record, column) => {
+				const handleClick = (event) => {
+					event.preventDefault();
+
+					column.onClick && column.onClick(record);
+				};
+
+				return	<Tooltip title={column.label} role="tooltip">
+					<GetAppIcon cursor='pointer' color="inherit" onClick={handleClick}/>
+				</Tooltip>;
+			};
+
+		const {columns=[]} = props;
+
+		const customColumn = {
+			actionType: "download",
+			dataType: "customActionType",
+			label: "Custom Action Type",
+			name: "customActionType",
+			renderer: customActionRenderer,
+			sortable: false,
+			tooltip: "Custom Action Type",
+			width: 100
+		}
+		return <WrappedGrid {...props} columns={[...columns, customColumn]} default={[...props.default, 'customActionType']}/>
+	});
+
 	/**
 	 * Custom Grid View factory with the custom column action
 	 */
 	const GridViewFactory = (props) => {
 		const ComposedGridView = R.compose(
-			withCustomColumnActionType,
 			withGridViewConfigLoader,
+			withCustomConfig,
 			withGridViewSettings(defaultGridViewSettings),
 			withGridViewDefaultActions,
 			withGridViewModelBulkActions,
