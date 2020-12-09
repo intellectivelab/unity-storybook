@@ -165,3 +165,82 @@ Implement the domain component factory in the way that the domain component mapp
 ```jsx
 const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
 ```
+
+<br/>
+
+## Example - Custom column action
+
+This example shows how to customize a Grid View component with adding a custom column action logic.
+
+### Steps
+
+Implement extension (HOC) for the grid that apply the custom column, action and renderer for it.
+
+```jsx
+	const withCustomConfig = R.curry((WrappedGrid, props) => {
+
+			const customActionRenderer= (value, record, column) => {
+				const handleClick = (event) => {
+					event.preventDefault();
+
+					column.onClick && column.onClick(record);
+				};
+
+				return	<Tooltip title={column.label} role="tooltip">
+					<GetAppIcon cursor='pointer' color="inherit" onClick={handleClick}/>
+				</Tooltip>;
+			};
+
+		const {columns=[]} = props;
+
+		const customColumn = {
+			actionType: "download",
+			dataType: "customActionType",
+			label: "Custom Action Type",
+			name: "customActionType",
+			renderer: customActionRenderer,
+			sortable: false,
+			tooltip: "Custom Action Type",
+			width: 100
+		}
+		return <WrappedGrid {...props} columns={[...columns, customColumn]} default={[...props.default, 'customActionType']}/>
+	});
+```
+
+Implement a custom factory component for the GridView component where we add withCustomConfig HOC.
+
+```jsx
+const GridViewFactory = (props) => {
+		const ComposedGridView = R.compose(
+			withGridViewConfigLoader,
+			withCustomConfig,
+			withGridViewSettings(defaultGridViewSettings),
+			withGridViewDefaultActions,
+			withGridViewModelBulkActions,
+			withGridViewRowActions,
+			withGridViewActionExecutor,
+			withGridViewDataLoader,
+			withGridViewSorting,
+			withGridViewSelection,
+			withGridViewPagination
+		)(GridView);
+
+		return (
+			<ComposedGridView {...props}/>
+		);
+	};
+```
+
+Create mapping conditions for the domain components.
+
+```jsx
+const DomainComponentMapping = R.cond([
+    [R.propEq('type', 'grid'), GridViewFactory],
+]);
+```
+
+Implement the domain component factory in the way that the domain component mapping comes first.
+
+```jsx
+const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+```
