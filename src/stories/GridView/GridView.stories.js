@@ -24,7 +24,6 @@ import {
 	withGridViewSelection,
 	withGridViewSettings,
 	withGridViewSorting,
-	withGridViewRowActions,
 	grids
 } from "@intellective/core";
 
@@ -193,6 +192,7 @@ export const UsingColumnRendering = () => {
 /*
 * Add row double-click handler
 */
+
 /**
  *  Custom action that implements customCellRenderer with onDoubleClick handler
  */
@@ -217,6 +217,7 @@ const withUseCustomCellRenderer = R.curry((WrappedGrid, props) => {
 
 	return <WrappedGrid {...props} useCellRenderer={useCustomCellRenderer}/>;
 });
+
 export const UsingDoubleClickHandler = () => {
 
 	/**
