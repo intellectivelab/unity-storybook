@@ -196,44 +196,7 @@ export const UsingCustomColumnAction = () => {
 	/**
 	 * Custom action that invokes download action on customActionType column click
 	 */
-	const withCustomColumnActionType = R.curry((WrappedGrid, props) => {
-
-		const customActionRenderer = R.curry((config, props, column) => {
-
-			return (value, record, column) => {
-				const handleClick = (event) => {
-					event.preventDefault();
-
-					column.onClick && column.onClick(record);
-				};
-
-				return	<Tooltip title={column.label} role="tooltip">
-					<GetAppIcon cursor='pointer' color="inherit" onClick={handleClick}/>
-				</Tooltip>;
-			};
-		});
-
-		const columnMapper = (props, config) => {
-			const tryCustomActionRenderer = R.cond([
-				[(column) => column.name === 'customActionType', customActionRenderer(config, props)],
-			]);
-
-			const useColumnActionType = R.cond([[R.propEq('dataType', 'customActionType'), R.always('download')]]);
-
-			return (column) => ({
-				...column,
-				// eslint-disable-next-line react-hooks/rules-of-hooks
-				actionType: column.actionType || useColumnActionType(column),
-				// eslint-disable-next-line react-hooks/rules-of-hooks
-				renderer: column.renderer || tryCustomActionRenderer(column, props) || useDefaultColumnRenderer(column)
-			});
-		};
-
-		return <WrappedGrid {...props} columnMapper={columnMapper} />;
-	});
-
-	const withCustomConfig = R.curry((WrappedGrid, props) => {
-
+		const withCustomConfig = R.curry((WrappedGrid, props) => {
 
 			const customActionRenderer= (value, record, column) => {
 				const handleClick = (event) => {
