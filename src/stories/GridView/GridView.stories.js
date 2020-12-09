@@ -200,6 +200,10 @@ export const UsingDoubleClickHandler = () => {
 		id, currentAction
 	});
 
+	/**
+	 *  Custom action that implements customCellRenderer with onDoubleClick handler
+	 */
+
 	const withUseCustomCellRenderer = R.curry((WrappedGrid, props) => {
 		const {id, actions} = props;
 
