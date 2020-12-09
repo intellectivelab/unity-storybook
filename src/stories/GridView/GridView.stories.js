@@ -7,6 +7,7 @@ import IconButton from "@material-ui/core/IconButton";
 import Print from "@material-ui/icons/Print";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
+import GetAppIcon from '@material-ui/icons/GetApp';
 
 import {
 	DefaultComponentFactory,
@@ -17,10 +18,12 @@ import {
 	withGridViewDefaultActions,
 	withGridViewModelBulkActions,
 	withGridViewPagination,
-	withGridViewQueryLoader,
+	withGridViewDataLoader,
 	withGridViewSelection,
 	withGridViewSettings,
-	withGridViewSorting
+	withGridViewSorting,
+	withGridViewRowActions,
+	useDefaultColumnRenderer
 } from "@intellective/core";
 
 import AppPage from "../../components/AppPage/AppPage";
@@ -72,7 +75,7 @@ export const UsingToolbarAction = () => {
 			withGridViewDefaultActions,
 			withGridViewModelBulkActions,
 			withGridViewActionExecutor,
-			withGridViewQueryLoader,
+			withGridViewDataLoader,
 			withGridViewSorting,
 			withGridViewSelection,
 			withGridViewPagination,
@@ -158,7 +161,7 @@ export const UsingColumnRendering = () => {
 			withGridViewDefaultActions,
 			withGridViewModelBulkActions,
 			withGridViewActionExecutor,
-			withGridViewQueryLoader,
+			withGridViewDataLoader,
 			withGridViewSorting,
 			withGridViewSelection,
 			withGridViewPagination,
@@ -182,6 +185,88 @@ export const UsingColumnRendering = () => {
 	return (
 		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
 		         ComponentFactory={DomainComponentFactory}/>
+	);
+}
+
+/*
+* Add custom column action
+*/
+export const UsingCustomColumnAction = () => {
+
+	/**
+	 * Custom action that invokes download action on customActionType column click
+	 */
+	const withCustomColumnActionType = R.curry((WrappedGrid, props) => {
+
+		const customActionRendererRenderer = () => () => {
+
+			return (value, record, column) => {
+				const handleClick = (event) => {
+					event.preventDefault();
+
+					column.onClick && column.onClick(record);
+				};
+
+				return	<Tooltip title={column.label} role="tooltip">
+					<GetAppIcon cursor='pointer' color="inherit" onClick={handleClick}/>
+				</Tooltip>;
+			};
+		};
+
+		const columnMapper = (props, config) => {
+			const tryCustomActionRenderer = R.cond([
+				[(column) => column.name === 'customActionType', customActionRendererRenderer(config, props)],
+			]);
+
+			const useColumnActionType = R.cond([[R.propEq('dataType', 'customActionType'), R.always('download')]]);
+
+			return (column) => ({
+				...column,
+				// eslint-disable-next-line react-hooks/rules-of-hooks
+				actionType: column.actionType || useColumnActionType(column),
+				// eslint-disable-next-line react-hooks/rules-of-hooks
+				renderer: column.renderer || tryCustomActionRenderer(column, props) || useDefaultColumnRenderer(column)
+			});
+		};
+
+		return <WrappedGrid {...props} columnMapper={columnMapper} />;
+	});
+
+	/**
+	 * Custom Grid View factory with the custom column action
+	 */
+	const GridViewFactory = (props) => {
+		const ComposedGridView = R.compose(
+			withCustomColumnActionType,
+			withGridViewConfigLoader,
+			withGridViewSettings(defaultGridViewSettings),
+			withGridViewDefaultActions,
+			withGridViewModelBulkActions,
+			withGridViewRowActions,
+			withGridViewActionExecutor,
+			withGridViewDataLoader,
+			withGridViewSorting,
+			withGridViewSelection,
+			withGridViewPagination
+		)(GridView);
+
+		return (
+			<ComposedGridView {...props}/>
+		);
+	};
+
+	const DomainComponentMapping = R.cond([
+		[R.propEq('type', 'grid'), GridViewFactory],
+	]);
+
+	/**
+	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
+	 */
+	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+
+	return (
+		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1"
+				 ComponentFactory={DomainComponentFactory}/>
 	);
 }
 
