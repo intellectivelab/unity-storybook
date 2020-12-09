@@ -23,7 +23,6 @@ import {
 	withGridViewSettings,
 	withGridViewSorting,
 	withGridViewRowActions,
-	useDefaultColumnRenderer
 } from "@intellective/core";
 
 import AppPage from "../../components/AppPage/AppPage";
