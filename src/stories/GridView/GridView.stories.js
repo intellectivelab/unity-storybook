@@ -24,6 +24,8 @@ import {
 	withGridViewSelection,
 	withGridViewSettings,
 	withGridViewSorting,
+	withGridViewRowActions,
+	grids
 } from "@intellective/core";
 
 import AppPage from "../../components/AppPage/AppPage";
@@ -191,47 +193,31 @@ export const UsingColumnRendering = () => {
 /*
 * Add row double-click handler
 */
+/**
+ *  Custom action that implements customCellRenderer with onDoubleClick handler
+ */
+const findCustomAction = actionName => R.find(R.propEq("name", actionName));
+
+const withUseCustomCellRenderer = R.curry((WrappedGrid, props) => {
+	const {id, actions} = props;
+	const dispatch = useDispatch();
+
+	const action = findCustomAction('view')(actions);
+
+	const useCustomCellRenderer = R.curry((classes, row, column) => {
+
+		const value = row[column.name];
+
+		return (
+			<TableCell onDoubleClick={() => dispatch(grids.updateGridCurrentAction(id, {action, selected: row}))} key={`${row.id}-${column.name}`} className={classes.tableCell} scope="row" variant="body">
+				{column.renderer ? column.renderer(value, row, column) : value}
+			</TableCell>
+		);
+	});
+
+	return <WrappedGrid {...props} useCellRenderer={useCustomCellRenderer}/>;
+});
 export const UsingDoubleClickHandler = () => {
-
-	const UPDATE_GRID_CURRENT_ACTION = "UPDATE_GRID_CURRENT_ACTION";
-
-	const updateGridCurrentAction = (id, currentAction) => ({
-		type: UPDATE_GRID_CURRENT_ACTION,
-		id, currentAction
-	});
-
-	/**
-	 *  Custom action that implements customCellRenderer with onDoubleClick handler
-	 */
-
-	const withUseCustomCellRenderer = R.curry((WrappedGrid, props) => {
-		const {id, actions} = props;
-
-		const action = R.find(R.propEq("name", "view"), actions);
-
-		const useCustomCellRenderer = R.curry((classes, row, column) => {
-			if (React.isValidElement(column)) {
-				return (
-					<TableCell key={`${row.id}-${column.props.name}`} className={classes.tableCell} scope="row" variant="body">
-						{React.cloneElement(column, {row})}
-					</TableCell>
-				);
-			}
-
-			const value = row[column.name];
-
-			// eslint-disable-next-line react-hooks/rules-of-hooks
-			const dispatch = useDispatch();
-
-			return (
-				<TableCell onDoubleClick={() => dispatch(updateGridCurrentAction(id, {action, selected: row}))} key={`${row.id}-${column.name}`} className={classes.tableCell} scope="row" variant="body">
-					{column.renderer ? column.renderer(value, row, column) : value}
-				</TableCell>
-			);
-		});
-
-		return <WrappedGrid {...props} useCellRenderer={useCustomCellRenderer}/>;
-	});
 
 	/**
 	 * Custom Grid View factory with double click handler addition
