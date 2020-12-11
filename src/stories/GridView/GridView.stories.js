@@ -23,6 +23,7 @@ import {
 	withGridViewSettings,
 	withGridViewSorting,
 	withGridViewRowActions,
+	useDefaultColumnRenderer
 } from "@intellective/core";
 
 import AppPage from "../../components/AppPage/AppPage";
@@ -261,4 +262,66 @@ export const UsingCustomColumnAction = () => {
 				 ComponentFactory={DomainComponentFactory}/>
 	);
 }
+
+export const UsingCustomColumnActionV2 = () => {
+
+	const withCustomColumnActionType = R.curry((WrappedGrid, props) => {
+
+		const useColumnActionType = R.cond([[R.propEq('name', 'fullName'), R.always('download')]]);
+
+		const customActionRenderer = R.curry((column) => {
+
+			return (value, record, column) => {
+				const handleClick = (event) => {
+					event.preventDefault();
+
+					column.onClick && column.onClick(record);
+				};
+
+				return	<Tooltip title={column.label} role="tooltip">
+					<GetAppIcon cursor='pointer' color="inherit" onClick={handleClick}/>
+				</Tooltip>;
+			};
+		});
+
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		const useColumnRenderer = column => R.cond([[R.propEq('name', 'fullName'), customActionRenderer]])(column) || useDefaultColumnRenderer(column);
+
+		return <WrappedGrid {...props} useColumnActionType={useColumnActionType} useColumnRenderer={useColumnRenderer} />;
+	});
+
+	const GridViewFactory = (props) => {
+		const ComposedGridView = R.compose(
+			withCustomColumnActionType,
+			withGridViewConfigLoader,
+			withGridViewSettings(defaultGridViewSettings),
+			withGridViewDefaultActions,
+			withGridViewModelBulkActions,
+			withGridViewRowActions,
+			withGridViewActionExecutor,
+			withGridViewDataLoader,
+			withGridViewSorting,
+			withGridViewSelection,
+			withGridViewPagination,
+		)(GridView);
+
+		return (
+			<ComposedGridView {...props}/>
+		);
+	};
+
+	const DomainComponentMapping = R.cond([
+		[R.propEq('type', 'grid'), GridViewFactory],
+	]);
+
+	/**
+	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
+	 */
+	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+
+	return (
+		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1"
+				 ComponentFactory={DomainComponentFactory}/>
+	);
+};
 
