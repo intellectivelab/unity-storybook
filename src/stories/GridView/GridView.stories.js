@@ -1,5 +1,7 @@
 import React, {useState} from 'react';
 
+import {useDispatch} from "react-redux";
+
 import * as R from "ramda";
 
 import Alert from "@material-ui/lab/Alert";
@@ -8,6 +10,7 @@ import Print from "@material-ui/icons/Print";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
 import GetAppIcon from '@material-ui/icons/GetApp';
+import TableCell from "@material-ui/core/TableCell";
 
 import {
 	DefaultComponentFactory,
@@ -23,7 +26,8 @@ import {
 	withGridViewSettings,
 	withGridViewSorting,
 	withGridViewRowActions,
-	useDefaultColumnRenderer
+	useDefaultColumnRenderer,
+	grids
 } from "@intellective/core";
 
 import AppPage from "../../components/AppPage/AppPage";
@@ -261,3 +265,70 @@ export const UsingCustomColumnAction = () => {
 	);
 };
 
+/*
+* Add row double-click handler
+*/
+
+/**
+ *  Custom action that implements customCellRenderer with onDoubleClick handler
+ */
+const findCustomAction = actionName => R.find(R.propEq("name", actionName));
+
+const withUseCustomCellRenderer = R.curry((WrappedGrid, props) => {
+	const {id, actions} = props;
+	const dispatch = useDispatch();
+
+	const action = findCustomAction('view')(actions);
+
+	const useCustomCellRenderer = R.curry((classes, row, column) => {
+
+		const value = row[column.name];
+
+		return (
+			<TableCell onDoubleClick={() => dispatch(grids.updateGridCurrentAction(id, {action, selected: row}))} key={`${row.id}-${column.name}`} className={classes.tableCell} scope="row" variant="body">
+				{column.renderer ? column.renderer(value, row, column) : value}
+			</TableCell>
+		);
+	});
+
+	return <WrappedGrid {...props} useCellRenderer={useCustomCellRenderer}/>;
+});
+
+export const UsingDoubleClickHandler = () => {
+
+	/**
+	 * Custom Grid View factory with double click handler addition
+	 */
+	const GridViewFactory = (props) => {
+		const ComposedGridView = R.compose(
+			withGridViewConfigLoader,
+			withGridViewSettings(defaultGridViewSettings),
+			withGridViewDefaultActions,
+			withGridViewModelBulkActions,
+			withGridViewActionExecutor,
+			withGridViewDataLoader,
+			withGridViewSorting,
+			withGridViewSelection,
+			withGridViewPagination,
+			withUseCustomCellRenderer
+		)(GridView);
+
+		return (
+			<ComposedGridView {...props}/>
+		);
+	};
+
+	const DomainComponentMapping = R.cond([
+		[R.propEq('type', 'grid'), GridViewFactory],
+	]);
+
+	/**
+	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
+	 */
+	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+
+	return (
+		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1"
+				 ComponentFactory={DomainComponentFactory}/>
+	);
+}
