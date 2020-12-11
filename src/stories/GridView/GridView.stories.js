@@ -194,80 +194,13 @@ export const UsingColumnRendering = () => {
 export const UsingCustomColumnAction = () => {
 
 	/**
-	 * Custom action that invokes download action on customActionType column click
+	 * Custom action that invokes download action on fullName column click instead of view action
 	 */
-		const withCustomConfig = R.curry((WrappedGrid, props) => {
-
-			const customActionRenderer= (value, record, column) => {
-				const handleClick = (event) => {
-					event.preventDefault();
-
-					column.onClick && column.onClick(record);
-				};
-
-				return	<Tooltip title={column.label} role="tooltip">
-					<GetAppIcon cursor='pointer' color="inherit" onClick={handleClick}/>
-				</Tooltip>;
-			};
-
-		const {columns=[]} = props;
-
-		const customColumn = {
-			actionType: "download",
-			dataType: "customActionType",
-			label: "Custom Action Type",
-			name: "customActionType",
-			renderer: customActionRenderer,
-			sortable: false,
-			tooltip: "Custom Action Type",
-			width: 100
-		}
-		return <WrappedGrid {...props} columns={[...columns, customColumn]} default={[...props.default, 'customActionType']}/>
-	});
-
-	/**
-	 * Custom Grid View factory with the custom column action
-	 */
-	const GridViewFactory = (props) => {
-		const ComposedGridView = R.compose(
-			withGridViewConfigLoader,
-			withCustomConfig,
-			withGridViewSettings(defaultGridViewSettings),
-			withGridViewDefaultActions,
-			withGridViewModelBulkActions,
-			withGridViewRowActions,
-			withGridViewActionExecutor,
-			withGridViewDataLoader,
-			withGridViewSorting,
-			withGridViewSelection,
-			withGridViewPagination
-		)(GridView);
-
-		return (
-			<ComposedGridView {...props}/>
-		);
-	};
-
-	const DomainComponentMapping = R.cond([
-		[R.propEq('type', 'grid'), GridViewFactory],
-	]);
-
-	/**
-	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
-	 */
-	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
-
-	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1"
-				 ComponentFactory={DomainComponentFactory}/>
-	);
-}
-
-export const UsingCustomColumnActionV2 = () => {
-
 	const withCustomColumnActionType = R.curry((WrappedGrid, props) => {
 
-		const useColumnActionType = R.cond([[R.propEq('name', 'fullName'), R.always('download')]]);
+		const mappedColumnName = 'gender';
+
+		const useColumnActionType = R.cond([[R.propEq('name', mappedColumnName), R.always('download')]]);
 
 		const customActionRenderer = R.curry((column) => {
 
@@ -278,18 +211,21 @@ export const UsingCustomColumnActionV2 = () => {
 					column.onClick && column.onClick(record);
 				};
 
-				return	<Tooltip title={column.label} role="tooltip">
+				return <Tooltip title={column.label} role="tooltip">
 					<GetAppIcon cursor='pointer' color="inherit" onClick={handleClick}/>
 				</Tooltip>;
 			};
 		});
 
 		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const useColumnRenderer = column => R.cond([[R.propEq('name', 'fullName'), customActionRenderer]])(column) || useDefaultColumnRenderer(column);
+		const useColumnRenderer = column => R.cond([[R.propEq('name', mappedColumnName), customActionRenderer]])(column) || useDefaultColumnRenderer(column);
 
 		return <WrappedGrid {...props} useColumnActionType={useColumnActionType} useColumnRenderer={useColumnRenderer} />;
 	});
 
+	/**
+	 * Custom Grid View factory with the custom column action
+	 */
 	const GridViewFactory = (props) => {
 		const ComposedGridView = R.compose(
 			withCustomColumnActionType,

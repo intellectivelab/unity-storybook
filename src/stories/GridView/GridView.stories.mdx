@@ -174,40 +174,38 @@ This example shows how to customize a Grid View component with adding a custom c
 
 ### Steps
 
-Implement extension (HOC) for the grid that apply the custom column, action and renderer for it.
+Implement extension (HOC) for the grid that apply the custom action and renderer for it.
 
 ```jsx
-	const withCustomConfig = R.curry((WrappedGrid, props) => {
+const withCustomColumnActionType = R.curry((WrappedGrid, props) => {
 
-			const customActionRenderer= (value, record, column) => {
+		const mappedColumnName = 'gender';
+
+		const useColumnActionType = R.cond([[R.propEq('name', mappedColumnName), R.always('download')]]);
+
+		const customActionRenderer = R.curry((column) => {
+
+			return (value, record, column) => {
 				const handleClick = (event) => {
 					event.preventDefault();
 
 					column.onClick && column.onClick(record);
 				};
 
-				return	<Tooltip title={column.label} role="tooltip">
+				return <Tooltip title={column.label} role="tooltip">
 					<GetAppIcon cursor='pointer' color="inherit" onClick={handleClick}/>
 				</Tooltip>;
 			};
+		});
 
-		const {columns=[]} = props;
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		const useColumnRenderer = column => R.cond([[R.propEq('name', mappedColumnName), customActionRenderer]])(column) || useDefaultColumnRenderer(column);
 
-		const customColumn = {
-			actionType: "download",
-			dataType: "customActionType",
-			label: "Custom Action Type",
-			name: "customActionType",
-			renderer: customActionRenderer,
-			sortable: false,
-			tooltip: "Custom Action Type",
-			width: 100
-		}
-		return <WrappedGrid {...props} columns={[...columns, customColumn]} default={[...props.default, 'customActionType']}/>
+		return <WrappedGrid {...props} useColumnActionType={useColumnActionType} useColumnRenderer={useColumnRenderer} />;
 	});
 ```
 
-Implement a custom factory component for the GridView component where we add withCustomConfig HOC.
+Implement a custom factory component for the GridView component where we add withCustomColumnActionType HOC.
 
 ```jsx
 const GridViewFactory = (props) => {
