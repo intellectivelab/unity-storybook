@@ -200,10 +200,10 @@ const withCustomColumnActionType = R.curry((WrappedGrid, props) => {
 Implement a custom factory component for the GridView component where we add withCustomColumnActionType HOC.
 
 ```jsx
-const GridViewFactory = (props) => {
+	const GridViewFactory = (props) => {
 		const ComposedGridView = R.compose(
+			withCustomColumnActionType,
 			withGridViewConfigLoader,
-			withCustomConfig,
 			withGridViewSettings(defaultGridViewSettings),
 			withGridViewDefaultActions,
 			withGridViewModelBulkActions,
@@ -212,8 +212,9 @@ const GridViewFactory = (props) => {
 			withGridViewDataLoader,
 			withGridViewSorting,
 			withGridViewSelection,
-			withGridViewPagination
+			withGridViewPagination,
 		)(GridView);
+
 		return (
 			<ComposedGridView {...props}/>
 		);
