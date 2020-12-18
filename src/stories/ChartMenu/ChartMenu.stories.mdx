@@ -14,16 +14,66 @@ This example shows how to add a menu with custom actions for a sunburst chart.
 
 ### Steps
 
-Implement custom component which adds setting to enable/disable hover action for a sunburst chart.
+Add a custom renderer for a Sunburst chart to handle 'hovered' setting changes.
 
 ```jsx
-const withSunburstSettings = R.curry((WrappedChart, props) => {
-        const chartSettings = {
-            sunburstSettings: [
+const SunburstCustomRenderer = (props) => {
+        const {
+            preferences,
+            classes,
+            hovered,
+            width,
+            height,
+            padAngle,
+            applyStyles,
+            valueMouseOverHandler,
+            valueMouseOutHandler,
+            valueClickHandler,
+            hintFormatter,
+            data,
+        } = props;
+
+        const _hovered = (preferences?.hovered ?? true) && hovered;
+        return (
+            <Grid item xs={12} className={classes.chart}>
+                <Box display="flex" justifyContent="center">
+                    <Box>
+                        <SunburstVis
+                            hideRootNode
+                            colorType='literal'
+                            width={width}
+                            height={height}
+                            padAngle={padAngle}
+                            data={{children: applyStyles(data)}}
+                            onValueMouseOver={valueMouseOverHandler}
+                            onValueMouseOut={valueMouseOutHandler}
+                            onValueClick={valueClickHandler}
+                            style={{margin: '0 auto'}}
+                        >
+                            {_hovered && <Hint value={_hovered} format={hintFormatter}/>}
+                        </SunburstVis>
+                    </Box>
+                </Box>
+            </Grid>
+        );
+    };
+```
+
+Implement custom component which adds setting to enable/disable hover action for a sunburst chart.
+Also provide custom chart mapper to use custom settings.
+
+```jsx
+ const withSunburstSettings = R.curry((WrappedChart, props) => {
+        const sunburstSettings = [
                 {name: 'hovered', label: 'Hovered'}
-            ]
-        };
-        return <WrappedChart {...props} chartSettings={chartSettings}/>;
+            ];
+
+        const ComposedSunburst = withChartSettings(sunburstSettings)(Sunburst);
+
+        const getChartByType = R.cond([
+            [R.equals('sunburst'), R.always(R.pair(ComposedSunburst, sunburstDataReducer(null)))]
+        ]);
+        return <WrappedChart {...props} getChartByType={getChartByType} ChartRenderer={SunburstCustomRenderer}/>;
     });
 ```
 
@@ -67,13 +117,17 @@ This example shows how to remove a default menu for a composite chart.
 ### Steps
 
 Implement custom component which removes a default menu for a composite chart.
+Add a custom mapper to pass VerticalPlotChart component without settings.
 
 ```jsx
  const withoutCompositeChartSettings = R.curry((WrappedChart, props) => {
-        const chartSettings = {
-            compositeChartSettings: null
-        };
-        return <WrappedChart {...props} chartSettings={chartSettings}/>;
+
+        const xyFunctor = (x, y) => ({x, y});
+
+        const getChartByType = R.cond([
+            [R.equals('vComposite'), R.always(R.pair(VerticalPlotChart, xyPlotDataReducer(xyFunctor, null)))],
+        ]);
+        return <WrappedChart {...props} getChartByType={getChartByType}/>;
     });
 ```
 
