@@ -25,6 +25,7 @@ import {
 	GridView,
 	ResourceCreateViewTitle,
 	ResourceCreateWizard,
+	TwoColumnsLayout,
 	withActionView,
 	withDomainFormFieldValidation,
 	withGridViewActionExecutor,
@@ -32,7 +33,7 @@ import {
 	withGridViewDefaultActions,
 	withGridViewModelBulkActions,
 	withGridViewPagination,
-	withGridViewQueryLoader,
+	withGridViewDataLoader,
 	withGridViewSelection,
 	withGridViewSettings,
 	withGridViewSorting,
@@ -40,6 +41,16 @@ import {
 } from "@intellective/core";
 
 export default {title: 'Examples/Form Validation'};
+
+const defaultConfig = {
+	variant: 'dialog',
+	fullScreen: true,
+	maxWidth: 'xl',
+	innerMaxWidth: 'lg',
+	margin: 'dense',
+	Layout: TwoColumnsLayout
+};
+
 
 const CreateCaseViewForm = R.compose(withResourceDataLoader)(DefaultViewForm);
 
@@ -53,7 +64,7 @@ const GridViewFactory = (props) => {
 		withGridViewDefaultActions,
 		withGridViewModelBulkActions,
 		withGridViewActionExecutor,
-		withGridViewQueryLoader,
+		withGridViewDataLoader,
 		withGridViewSorting,
 		withGridViewSelection,
 		withGridViewPagination,
@@ -105,8 +116,8 @@ export const UsingFormFieldValidation = () => {
 
 	const DomainCreateCaseAction = R.compose(withCustomFieldValidation, CreateCaseWithAttachments);
 
-	function DomainActionFactory(defaultSettings = {}) {
-		DefaultActionFactory.call(this, defaultSettings);
+	function DomainActionFactory(config = defaultConfig) {
+		DefaultActionFactory.call(this, config);
 
 		const DomainActionMapper = R.curry((settings = {}, action) => {
 			// Add custom actions creation logic here. For example,
@@ -125,7 +136,7 @@ export const UsingFormFieldValidation = () => {
 
 			const {view: viewSettings = {}} = settings;
 
-			const ActionComponent = DomainActionMapper({...defaultSettings, ...viewSettings}, action) || DefaultActionMapper({...defaultSettings, ...viewSettings}, action);
+			const ActionComponent = DomainActionMapper({...defaultConfig, ...viewSettings}, action) || DefaultActionMapper({...defaultConfig, ...viewSettings}, action);
 
 			return <ActionComponent {...otherProps} {...action} action={action}/>;
 		});
@@ -163,8 +174,8 @@ export const UsingFormSubmitHandler = () => {
 		R.andThen(DefaultCreateCaseSubmitHandler)
 	);
 
-	function DomainActionFactory(defaultSettings = {}) {
-		DefaultActionFactory.call(this, defaultSettings);
+	function DomainActionFactory(config = defaultConfig) {
+		DefaultActionFactory.call(this, config);
 
 		const DomainFormSubmitHandlerMapper = R.cond([
 			[isCreateCaseAction, R.always(DomainCreateCaseSubmitHandler)],
@@ -249,8 +260,8 @@ export const UsingFormValidation = () => {
 		submitLabel: 'Create Case'
 	}, () => null);
 
-	function DomainActionFactory(defaultSettings = {}) {
-		DefaultActionFactory.call(this, defaultSettings);
+	function DomainActionFactory(config = defaultConfig) {
+		DefaultActionFactory.call(this, config);
 
 		const DomainActionMapper = R.curry((settings = {}, action) => {
 			// Add custom actions creation logic here. For example,
@@ -269,7 +280,7 @@ export const UsingFormValidation = () => {
 
 			const {view: viewSettings = {}} = settings;
 
-			const ActionComponent = DomainActionMapper({...defaultSettings, ...viewSettings}, action) || DefaultActionMapper({...defaultSettings, ...viewSettings}, action);
+			const ActionComponent = DomainActionMapper({...defaultConfig, ...viewSettings}, action) || DefaultActionMapper({...defaultConfig, ...viewSettings}, action);
 
 			return <ActionComponent {...otherProps} {...action} action={action}/>;
 		});
