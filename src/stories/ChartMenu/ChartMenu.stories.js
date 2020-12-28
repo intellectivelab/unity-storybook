@@ -79,9 +79,9 @@ export const CustomChartMenu = () => {
 };
 
 /**
- * Remove menu for composite chart
+ * Without default chart menu
  */
-export const RemoveCompositeChartSettingsMenu = () => {
+export const WithoutDefaultChartSettingsMenu = () => {
 
     const withoutCompositeChartSettings = R.curry((WrappedChart, props) => {
 

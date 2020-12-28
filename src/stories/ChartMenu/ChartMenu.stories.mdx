@@ -78,7 +78,7 @@ Implement the domain component factory in the way that the domain component mapp
 
 <br/>
 
-## Example - Remove menu for composite chart
+## Example - Without default chart menu
 
 This example shows how to remove a default menu for a composite chart.
 
@@ -88,7 +88,7 @@ Implement custom component which removes a default menu for a composite chart.
 Add a custom mapper to pass VerticalPlotChart component without settings.
 
 ```jsx
- const withoutCompositeChartSettings = R.curry((WrappedChart, props) => {
+ const WithoutDefaultChartSettingsMenu = R.curry((WrappedChart, props) => {
 
         const xyFunctor = (x, y) => ({x, y});
 
