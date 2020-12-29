@@ -142,7 +142,15 @@ module.exports = {
                 "dataType": "integer",
                 "ui": "rating",
                 "defaultValue": 0
+            },
+            {
+                "name": "phone",
+                "label": "Phone",
+                "dataType": "string",
+                "ui": "phone",
+                "placeholder": "123-456-7890"
             }
+
         ],
         "sections": [{
             "title": "SLA",
@@ -324,7 +332,15 @@ module.exports = {
                 "dataType": "integer",
                 "ui": "rating",
                 "defaultValue": 0
+            },
+            {
+                "name": "phone",
+                "label": "Phone",
+                "dataType": "string",
+                "ui": "phone",
+                "placeholder": "123-456-7890"
             }
+
         ],
         "sections": [],
         "_links": {
