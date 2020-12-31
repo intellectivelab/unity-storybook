@@ -174,13 +174,17 @@ This example shows how to customize a Grid View component with adding a custom c
 
 ### Steps
 
-Implement extension (HOC) for the grid that apply the custom action and renderer for it.
+Implement custom column action mapper for gender column.
 
 ```jsx
-const withCustomColumnActionType = R.curry((WrappedGrid, props) => {
-		const mappedColumnName = 'gender';
-		const useColumnActionType = R.cond([[R.propEq('name', mappedColumnName), R.always('download')]]);
-		const customActionRenderer = R.curry((column) => {
+const mappedColumnName = 'gender';
+const useColumnActionType = R.cond([[R.propEq('name', mappedColumnName), R.always('download')]]);
+```
+
+Create a custom renderer and use it for gender column to indicate custom action.
+
+```jsx
+const customActionRenderer = R.curry((column) => {
 			return (value, record, column) => {
 				const handleClick = (event) => {
 					event.preventDefault();
@@ -191,8 +195,13 @@ const withCustomColumnActionType = R.curry((WrappedGrid, props) => {
 				</Tooltip>;
 			};
 		});
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const useColumnRenderer = column => R.cond([[R.propEq('name', mappedColumnName), customActionRenderer]])(column) || useDefaultColumnRenderer(column);
+const useColumnRenderer = column => R.cond([[R.propEq('name', mappedColumnName), customActionRenderer]])(column) || useDefaultColumnRenderer(column);
+```
+
+Implement extension (HOC) for the grid to put changes above together.
+
+```jsx
+const withCustomColumnActionType = R.curry((WrappedGrid, props) => {
 		return <WrappedGrid {...props} useColumnActionType={useColumnActionType} useColumnRenderer={useColumnRenderer} />;
 	});
 ```
