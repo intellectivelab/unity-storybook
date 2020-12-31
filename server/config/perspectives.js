@@ -112,6 +112,28 @@ module.exports = [
                 }
             },
 			{
+				"id": "page14",
+				"title": "Employees Search",
+				"tooltip": "Single Template",
+				"lazy": true,
+				"components": [
+					{
+						"id": "usersSearchWithVerifyAction",
+						"type": "searchTemplate",
+						"_links": {
+							"config": {
+								"href": "/api/config/components/usersSearchWithVerifyAction"
+							}
+						}
+					},
+				],
+				"_links": {
+					"self": {
+						"href": "/api/config/perspectives/search/dashboards/page14"
+					},
+				}
+			},
+			{
 				"id": "ticks_page",
 				"title": "Chart ticks customization",
 				"tooltip": "SLA",

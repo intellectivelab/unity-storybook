@@ -1,33 +1,33 @@
-import React, {useState} from 'react';
+import React from 'react';
 
 import {useDispatch} from "react-redux";
 
 import * as R from "ramda";
 
 import Alert from "@material-ui/lab/Alert";
-import IconButton from "@material-ui/core/IconButton";
-import Print from "@material-ui/icons/Print";
 import Tooltip from "@material-ui/core/Tooltip";
-import Typography from "@material-ui/core/Typography";
-import GetAppIcon from '@material-ui/icons/GetApp';
 import TableCell from "@material-ui/core/TableCell";
+
+import GetAppIcon from '@material-ui/icons/GetApp';
 
 import {
 	DefaultComponentFactory,
 	defaultGridViewSettings,
+	forms,
+	grids,
 	GridView,
+	resources,
+	useDefaultColumnRenderer,
 	withGridViewActionExecutor,
 	withGridViewConfigLoader,
+	withGridViewDataLoader,
 	withGridViewDefaultActions,
 	withGridViewModelBulkActions,
 	withGridViewPagination,
-	withGridViewDataLoader,
+	withGridViewRowActions,
 	withGridViewSelection,
 	withGridViewSettings,
-	withGridViewSorting,
-	withGridViewRowActions,
-	useDefaultColumnRenderer,
-	grids
+	withGridViewSorting
 } from "@intellective/core";
 
 import AppPage from "../../components/AppPage/AppPage";
@@ -35,81 +35,9 @@ import AppPage from "../../components/AppPage/AppPage";
 export default {title: 'Examples/Grid View'};
 
 /*
-* Add custom toolbar action to the grid component
-*/
-export const UsingToolbarAction = () => {
-
-	/**
-	 * Custom action that prints "Hello World" message below the grid
-	 */
-	const withGridViewPrintAction = R.curry((WrappedGrid, props) => {
-		const {id: gridId, defaultActions = []} = props;
-
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const [msg, updateMsg] = useState();
-
-		const onRefreshHandler = () => updateMsg("Hello World");
-
-		const _defaultActions = [
-			...defaultActions,
-			<Tooltip title="Print" key={`${gridId}-print-action`} role="tooltip">
-				<IconButton onClick={onRefreshHandler} role="button" aria-label="Refresh">
-					<Print/>
-				</IconButton>
-			</Tooltip>,
-		];
-
-		return (
-			<>
-				<WrappedGrid {...props} defaultActions={_defaultActions}/>
-
-				<Typography variant="h1">{msg}</Typography>
-			</>
-		);
-	});
-
-	/**
-	 * Custom Grid View factory with the custom action
-	 */
-	const GridViewFactory = (props) => {
-
-		const ComposedGridView = R.compose(
-			withGridViewConfigLoader,
-			withGridViewSettings(defaultGridViewSettings),
-			withGridViewDefaultActions,
-			withGridViewModelBulkActions,
-			withGridViewActionExecutor,
-			withGridViewDataLoader,
-			withGridViewSorting,
-			withGridViewSelection,
-			withGridViewPagination,
-			withGridViewPrintAction
-		)(GridView);
-
-		return (
-			<ComposedGridView {...props}/>
-		);
-	};
-
-	const DomainComponentMapping = R.cond([
-		[R.propEq('type', 'grid'), GridViewFactory],
-	]);
-
-	/**
-	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
-	 */
-	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
-
-	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1"
-		         ComponentFactory={DomainComponentFactory}/>
-	);
-};
-
-/*
 * Add custom column renderer
 */
-export const UsingColumnRendering = () => {
+export const UsingCustomColumnRenderer = () => {
 
 	const mapValue = R.cond([
 		[R.is(Array), R.map(R.when(R.is(Object), R.prop('value')))],
@@ -184,13 +112,13 @@ export const UsingColumnRendering = () => {
 	/**
 	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
 	 */
-	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props);
 
 	return (
 		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
 		         ComponentFactory={DomainComponentFactory}/>
 	);
-}
+};
 
 /*
 * Add custom column action
@@ -257,7 +185,7 @@ export const UsingCustomColumnAction = () => {
 	/**
 	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
 	 */
-	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props);
 
 	return (
 		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1"
@@ -265,20 +193,17 @@ export const UsingCustomColumnAction = () => {
 	);
 };
 
-/*
-* Add row double-click handler
-*/
-
 /**
- *  Custom action that implements customCellRenderer with onDoubleClick handler
+ *  Custom action that implements cellRenderer with onDoubleClick handler
  */
-const findCustomAction = actionName => R.find(R.propEq("name", actionName));
-
 const withUseCustomCellRenderer = R.curry((WrappedGrid, props) => {
+	const findAction = actionName => R.find(R.propEq("name", actionName));
+
 	const {id, actions} = props;
+
 	const dispatch = useDispatch();
 
-	const action = findCustomAction('view')(actions);
+	const action = findAction('view')(actions);
 
 	const useCustomCellRenderer = R.curry((classes, row, column) => {
 
@@ -294,7 +219,10 @@ const withUseCustomCellRenderer = R.curry((WrappedGrid, props) => {
 	return <WrappedGrid {...props} useCellRenderer={useCustomCellRenderer}/>;
 });
 
-export const UsingDoubleClickHandler = () => {
+/*
+* Add custom row click handler
+*/
+export const UsingCustomColumnClickHandler = () => {
 
 	/**
 	 * Custom Grid View factory with double click handler addition
@@ -325,10 +253,11 @@ export const UsingDoubleClickHandler = () => {
 	/**
 	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
 	 */
-	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props);
 
 	return (
 		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1"
-				 ComponentFactory={DomainComponentFactory}/>
+				 ComponentFactory={DomainComponentFactory}
+		/>
 	);
-}
+};
