@@ -261,10 +261,6 @@ module.exports = {
                 "dataType": "string",
                 "selectorId": 'country',
                 "required": false,
-                "defaultValue": {
-                    "name": 'United States',
-                    "value": 'US'
-                },
                 "width": 200,
                 "tooltip": "",
                 "_links": {
