@@ -1,0 +1,132 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Chart Menu/README"/>
+
+# Chart Menu Examples
+
+This page provides various examples of customizing Chart Menu.
+
+<br/>
+
+## Example - Custom menu for sunburst chart
+
+This example shows how to add a menu with custom actions for a sunburst chart.
+
+### Steps
+
+Add a custom renderer for a Sunburst chart to handle 'hovered' setting changes.
+
+```jsx
+const withCustomSunburstRenderer = R.curry((preferences, WrappedComponent, props) => {
+    const {hovered} = props;
+    const {hovered: prefHovered} = preferences || {};
+    return <WrappedComponent {...props} hovered={(prefHovered ?? true) && hovered}/>;
+});
+```
+
+Implement custom component which adds setting to enable/disable hover action for a sunburst chart.
+
+```jsx
+ const withSunburstSettings = R.curry((WrappedChart, props) => {
+
+    const {id} = props;
+
+    const sunburstSettings = [
+        {name: 'hovered', label: 'Hovered'}
+    ];
+
+    const {preferences, onPreferenceChange} = useLocalPreferences(id);
+
+    const ComposedSunburst = useMemo(() => withChartSettings(sunburstSettings)(WrappedChart), []);
+
+    const CustomSunburstRenderer = withCustomSunburstRenderer(preferences, DefaultSunburstRenderer);
+
+    return <ComposedSunburst {...props} preferences={preferences} onPreferenceChange={onPreferenceChange}
+                             ChartRenderer={CustomSunburstRenderer}/>;
+});
+```
+
+Implement a custom extension to use custom chart mapper in DefaultChartFactory.
+
+```jsx
+const getChartByType = R.cond([
+            [R.equals('sunburst'), R.always(R.pair(withSunburstSettings(Sunburst), sunburstDataReducer(null)))],
+            [R.T, getDefaultChartByType]
+        ]);
+
+
+        const withDomainChart = R.curry((WrappedChartFactory, props) => {
+            return (
+                <WrappedChartFactory {...props} getChartByType={getChartByType}/>
+            );
+        });
+```
+
+Create mapping conditions for the domain components.
+
+```jsx
+        const DomainComponentMapping = R.cond([
+            [R.propEq('type', 'chart'), withDomainChart(DefaultChartFactory)]
+        ]);
+```
+
+Implement the domain component factory in the way that the domain component mapping comes first.
+
+```jsx
+    const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+```
+
+<br/>
+
+## Example - Without default chart menu
+
+This example shows how to remove a default menu for a composite chart.
+
+### Steps
+
+Implement custom component which removes a default menu for a composite chart.
+Add a custom mapper to pass VerticalPlotChart component without settings.
+
+```jsx
+ const WithoutDefaultChartSettingsMenu = R.curry((WrappedChart, props) => {
+
+        const xyFunctor = (x, y) => ({x, y});
+
+        const getChartByType = R.cond([
+            [R.equals('vComposite'), R.always(R.pair(VerticalPlotChart, xyPlotDataReducer(xyFunctor, null)))],
+            [R.T, getDefaultChartByType]
+        ]);
+        return <WrappedChart {...props} getChartByType={getChartByType}/>;
+    });
+```
+
+Implement a custom factory component for the DefaultChartContainer component where we add the custom action into the compose function.
+
+```jsx
+    const CustomChartFactory = (props) => {
+        const {Component = DefaultChartContainer, ...otherProps} = props;
+
+        const Chart = R.compose(
+            withChartConfigLoader,
+            withoutCompositeChartSettings
+        )(Component);
+
+        return (
+            <Chart {...otherProps} />
+        );
+    };
+```
+
+Create mapping conditions for the domain components.
+
+```jsx
+    const DomainComponentMapping = R.cond([
+        [R.propEq('type', 'chart'), CustomChartFactory]
+    ]);
+```
+
+Implement the domain component factory in the way that the domain component mapping comes first.
+
+```jsx
+    const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+```
