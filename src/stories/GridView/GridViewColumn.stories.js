@@ -196,14 +196,14 @@ export const UsingCustomColumnAction = () => {
 /**
  *  Custom action that implements cellRenderer with onDoubleClick handler
  */
-const findCustomAction = actionName => R.find(R.propEq("name", actionName));
-
 const withUseCustomCellRenderer = R.curry((WrappedGrid, props) => {
+	const findAction = actionName => R.find(R.propEq("name", actionName));
+
 	const {id, actions} = props;
 
 	const dispatch = useDispatch();
 
-	const action = findCustomAction('view')(actions);
+	const action = findAction('view')(actions);
 
 	const useCustomCellRenderer = R.curry((classes, row, column) => {
 
