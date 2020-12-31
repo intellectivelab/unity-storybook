@@ -146,6 +146,59 @@ module.exports = [
 						"href": "/api/config/perspectives/search/dashboards/dashboard/actions"
 					},
 				}
+			},
+			{
+				"id": "custom_menu_page",
+				"title": "Menu customization",
+				"tooltip": "SLA",
+				"lazy": true,
+				"builder": 'dashboard',
+				"components": [
+					{
+						"id": "TaskNamesByStartDate",
+						"type": "chart",
+						"_links": {
+							"config": {
+								"href": "/api/config/components/TaskNamesByStartDate"
+							}
+						}
+					},
+				],
+				"_links": {
+					"self": {
+						"href": "/api/config/perspectives/search/dashboards/custom_menu_page"
+					},
+					"actions": {
+						"href": "/api/config/perspectives/search/dashboards/dashboard/actions"
+					},
+				}
+			},
+			{
+				"id": "sunburst_menu_page",
+				"title": "Sunburst menu addition",
+				"tooltip": "SLA",
+				"lazy": true,
+				"builder": 'dashboard',
+				"components": [
+					{
+						"id": "CaseTypeByLocationBreakdown",
+						"type": "chart",
+						"layout": "X6",
+						"_links": {
+							"config": {
+								"href": "/api/config/components/CaseTypeByLocationBreakdown"
+							}
+						}
+					}
+				],
+				"_links": {
+					"self": {
+						"href": "/api/config/perspectives/search/dashboards/sunburst_menu_page"
+					},
+					"actions": {
+						"href": "/api/config/perspectives/search/dashboards/dashboard/actions"
+					},
+				}
 			}
 		],
 		"_links": {
