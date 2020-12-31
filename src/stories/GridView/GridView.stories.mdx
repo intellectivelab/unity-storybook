@@ -82,6 +82,282 @@ const DomainComponentFactory = (props) => DomainComponentMapping(props) || Defau
 
 <br/>
 
+## Example - Custom toolbar bulk action with configured view
+
+This example shows how to add custom action with configurable via solution file view to a Grid View component.
+
+### Steps
+
+We're going to add custom `Verify` action to a toolbar. To do that first of all define a conditional logic, which 
+allows to detect our new action:
+
+```jsx 
+    const isVerifyAction = R.allPass([R.propEq('type', 'custom.verify'), isDocument]);
+``` 
+
+In code snippet above it checks, that action's `resourceName` property equals `documents` and it's `type` 
+is `custom.verify`.
+
+Implement form submit handler for `Verify` action:
+
+```jsx 
+	const VerifyFormSubmitHandler = (props) => {
+		const {actionLink, data, fields = {}, selected} = props;
+
+		const parsedFormData = parseFormData(data, fields);
+
+		const payload = {ids: selected.map(s => s.id), formData: parsedFormData};
+
+		return actionLink && submitRequest(actionLink, payload, 'POST');
+	};
+```
+
+This handler will generate a payload with `ids` and `formData` keys, where `ids` is an array, which contains selected 
+records ids, and `formData` is a form data containing object. Created payload will be sent to action execution link, 
+i.e. action's href.
+
+Customize DefaultFormSubmitHandlerMapper by adding condition for `Verify` action:
+
+```jsx
+	const DomainFormSubmitHandlerMapper = R.cond([
+		[isVerifyAction, R.always(VerifyFormSubmitHandler)],
+		[R.T, DefaultFormSubmitHandlerMapper]
+	]);
+``` 
+
+Define headless handler for Verify action. It is executed if `view` link hasn't been returned for some reason.
+
+```jsx
+	const VerifyHeadlessBulkAction = (props) => {
+		const {action, selected, onSuccess, onError} = props;
+
+		useEffect(() => {
+			const ids = Array.isArray(selected) ? selected.map(s => s.id) : [selected.id];
+
+			const payload = {ids, formData: {}};
+
+			action.href && submitRequest(action.href, payload, 'POST').then(onSuccess).catch(onError);
+		}, []);
+
+		return null;
+	};
+```
+
+Similarly to VerifyFormSubmitHandler it creates a payload with `ids` and `formData` keys. Since for this particular case 
+we don't have a view, `formData` object is empty. Payload will be sent to action execution link, i.e. action's href.
+
+Implement `Verify` action:
+
+```jsx
+	const VerifyAction = (props) => withActionView({
+		...props,
+		title: "Verify",
+		submitLabel: "Verify",
+		ViewForm: R.compose(withFormCleanup, withFormSubmitAction)(DefaultViewForm),
+		viewLinkFn: ({_links: actionLinks}, objLinks) => getLinkByRel(objLinks, 'view') || getLinkByRel(actionLinks, 'view'),
+	}, withActionBackdrop(VerifyHeadlessBulkAction));
+```
+
+`withActionView` function uses 2 arguments. The first one contains some action view properties, like `title`, 
+`submitLabel`, `ViewForm` (in code snippet above it's a DefaultViewForm, wrapped with 2 functions: withFormCleanup and
+withFormSubmitAction), `viewLinkFn`. Second argument is a handler for case when evaluated by `viewLinkFn` function
+`view` link is empty by some reason.
+
+Example of `withFormCleanup` function, that allows to cleanup form after component is unmounted:
+
+```jsx
+	const {formId} = props;
+	const dispatch = useDispatch();
+	const cleanup = () => dispatch(clearFormState(formId));
+
+	useEffect(() => {
+		return cleanup;
+	}, []);
+
+	return <WrappedComponent {...props}/>;
+```
+
+As an option you may redeclare `onSuccess` and `onClose` functions inside `withFormCleanup` function 
+(instead of `useEffect` hook), so that form isn't cleared when server returns error.
+
+Customize DefaultActionMapper by adding extra condition for `Verify` action:
+
+```jsx
+	const DomainActionMapper = R.curry((settings = {}, action) => {
+		return R.cond([
+			[isVerifyAction, R.always(VerifyAction(settings))],
+			[R.T, action => DefaultActionMapper(settings, action)],
+		])(action);
+	});
+```
+
+Create an action factory component by passing created above action mapper and form submit handler 
+mapper into a constructor:
+
+```jsx
+	const ActionFactory =
+		new DefaultActionFactory(actionFactoryConfig, DomainActionMapper, DomainFormSubmitHandlerMapper);
+```
+
+<br/>
+
+## Example - Custom toolbar bulk action with own view
+
+This example shows how to add custom action with own view to a Grid View component.
+
+### Steps
+
+We're going to add custom `Verify` action to a toolbar. To do that first of all define a conditional logic, which 
+allows to detect our new action:
+
+```jsx 
+    const isVerifyAction = R.allPass([R.propEq('type', 'custom.verify'), isDocument]);
+``` 
+
+In code snippet above it checks, that action's `resourceName` property equals `documents` and it's `type` 
+is `custom.verify`.
+
+Implement form submit handler for `Verify` action:
+
+```jsx 
+	const VerifyFormSubmitHandler = (props) => {
+		const {actionLink, data, fields = {}, selected} = props;
+
+		const formData = parseFormData(data, fields);
+
+		const payload = {ids: selected.map(s => s.id), formData};
+
+		return actionLink && submitRequest(actionLink, payload, 'POST');
+	};
+```
+
+This handler will generate a payload with `ids` and `formData` keys, where `ids` is an array, which contains selected 
+records ids, and `formData` is a form data containing object. Created payload will be sent to action execution link, 
+i.e. action's href.
+
+Customize DefaultFormSubmitHandlerMapper by adding condition for `Verify` action:
+
+```jsx
+	const DomainFormSubmitHandlerMapper = R.cond([
+		[isVerifyAction, R.always(VerifyFormSubmitHandler)],
+		[R.T, DefaultFormSubmitHandlerMapper]
+	]);
+``` 
+
+Implement a view for `Verify` action:
+
+```jsx
+	const VerifyViewForm = (props) => {
+		const {classes, formId, actions, loading, FieldComponent = FormField} = props;
+
+		const dispatch = useDispatch();
+		const formData = useSelector(R.path(["forms", formId, 'data']));
+
+		useEffect(() => {
+			const data = {age: {type: 'range', name: 'range', label: 'Age', value: [18, 60]}};
+			dispatch(updateFormState(formId, {data, objLinks: {}}));
+		}, []);
+
+		return (<>
+			<div className={classes.root}>
+
+				{actions && actions.length > 0 &&
+				  <Toolbar role="toolbar">
+					{loading && <div style={{width: '100%'}}><LinearProgress color="primary"/></div>}
+					{!loading && <div style={{flex: '1 1'}}/>}
+					{!loading && actions}
+				</Toolbar>}
+
+				<div className={classes.content}>
+					<Typography display='block' variant="subtitle2" color='textPrimary'>
+						Specified age range: {`${R.path(['age', 'value', 0], formData)} - ${R.path(['age', 'value', 1], formData)}`} <sup>1</sup>
+					</Typography>
+					<form id={formId} noValidate role="form" aria-label="Details View">
+						<FieldComponent {...R.prop('age', formData)} formatValue={x => `${x} years`}
+										data={[{value: 0}, {value: 18}, {value: 25}, {value: 35}, {value: 45}, {value: 60}, {value: 99}]}
+										formatValue={x => `${x} years`}
+										onChange={(value) => dispatch(updateFieldValue(formId, 'age', value))}/>
+					</form>
+					<Typography display='block' variant="body2" color='textSecondary' mt={3}>
+						<p><sup>1</sup>A business must identify and understand its target audience if their marketing campaign is
+							to be successful. It allows the business to craft their products or services to the wants
+							and needs of customers, in order to maximise sales and therefore revenue.
+							A successful marketing campaign connects with consumers on a personal dB level, which will
+							help the business to develop long-term relationships with customers (Sherlock, 2014).
+						</p>
+
+						<p>Not all consumers are the same. Determining the target audience is key to reaching the loyal
+							and high-profit customers, in order to ensure a return on investment (Cahill, 1997, p. 10-11).
+						</p>
+
+						<p>To determine the target audience, the business must first identify what problem their
+							product or service solves, or what need or want it fulfills (Sherlock, 2014).
+							The problem must be one that consumers are aware of and thus will be interested in solving.
+						</p>
+					</Typography>
+				</div>
+			</div>
+		</>)
+	};
+```
+
+The form contains submit button, slider component to specify age range for the action and some text. 
+The form is initialized with following value for slider field - [18, 60] and uses `forms` store to keep and 
+retrieve `age` field values.
+
+Implement `Verify` action:
+
+```jsx
+	const VerifyAction = (props) => withActionView({
+		...props,
+		title: "Verify",
+		submitLabel: "Verify",
+		ViewForm: R.compose(withFormSubmitAction, withStyles(styles))(VerifyViewForm),
+	}, () => null);
+```
+
+`withActionView` function uses 2 arguments. 
+
+First argument contains action view properties, like `title`, `submitLabel` and `ViewForm`. `ViewForm` uses defined 
+above `VerifyViewForm` with 2 HOCs. Wrapping view with `withFormSubmitAction` function adds some extra logic 
+for submit button. `withStyles` HOC allows to add some extra styling; example for `styles` attribute is in the 
+snippet below:
+
+```jsx
+	const styles = (theme) => ({
+		root: {
+			width: '100%',
+		},
+		content: {
+			marginTop: theme.spacing(2)
+		},
+	});
+```
+
+The second argument of `withActionView` is just a function which returns `null`: there is no need to specify a 
+headless handler since no way we haven't view for the action. 
+
+Customize DefaultActionMapper by adding extra condition for `Verify` action:
+
+```jsx
+	const DomainActionMapper = R.curry((settings = {}, action) => {
+		return R.cond([
+			[isVerifyAction, R.always(VerifyAction(settings))],
+			[R.T, action => DefaultActionMapper(settings, action)],
+		])(action);
+	});
+```
+
+Create an action factory component by passing created above action mapper and form submit handler 
+mapper into a constructor:
+
+```jsx
+	const ActionFactory =
+		new DefaultActionFactory(actionFactoryConfig, DomainActionMapper, DomainFormSubmitHandlerMapper);
+```
+
+<br/>
+
 ## Example - Custom column renderer
 
 This example shows how to customize a Grid View component with adding a custom column rendering logic.
