@@ -6,11 +6,12 @@ git clone https://github.com/intellectivelab/unity-ui-storybook.git
 cd unity-ui-storybook
 git reset --hard $COMMIT_SHA
 
-echo "Stopping a container"
+echo "Stopping containers"
+docker stop storybook_install
 docker stop storybook
 docker stop storybook_api
 
-echo "Launching a new one"
+echo "Launching new instances"
 chmod +x ./run_docker.sh && ./run_docker.sh
 
 echo "Cleaning up"
