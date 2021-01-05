@@ -4,6 +4,7 @@ import {useDispatch, useSelector} from "react-redux";
 
 import * as R from "ramda";
 
+import Button from "@material-ui/core/Button";
 import IconButton from "@material-ui/core/IconButton";
 import Tooltip from "@material-ui/core/Tooltip";
 import Typography from "@material-ui/core/Typography";
@@ -21,6 +22,7 @@ import {
 	DefaultViewForm,
 	FormField,
 	forms,
+	grids,
 	GridView,
 	parseFormData,
 	resources,
@@ -37,9 +39,9 @@ import {
 	withGridViewPagination,
 	withGridViewSelection,
 	withGridViewSettings,
-	withGridViewSorting
+	withGridViewSorting,
+	withSnackbar
 } from "@intellective/core";
-
 import AppPage from "../../components/AppPage/AppPage";
 
 export default {title: 'Examples/Grid View'};
@@ -363,5 +365,143 @@ export const UsingCustomBulkActionWithCustomView = () => {
 	return (
 		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page14"
 		         ActionFactory={ActionFactory}/>
+	);
+};
+
+
+/*
+* Add custom toolbar bulk action with configured view to the grid component
+*/
+
+const withGridCustomBulkAction = R.curry((WrappedGrid, props) => {
+	const {actions = [], id} = props;
+
+	const dispatch = useDispatch();
+
+	const selected = useSelector(R.path(["grids", id, "selected"]));
+
+	const handleActionClick = (action, selected = []) => {
+		dispatch(grids.updateGridCurrentAction(id, {action, selected}));
+	};
+
+	const customAction = R.find(R.propEq("type", "custom.verify"), actions);
+
+	const bulkActions = customAction ? [
+		<Button
+			name={customAction.name}
+			variant="contained"
+			size="medium"
+			color="primary"
+			tabIndex="0"
+			onClick={() => handleActionClick(customAction, selected)} role="button">
+			{customAction.label}
+		</Button>
+	] : [];
+
+	return <WrappedGrid {...props} bulkActions={bulkActions}/>;
+});
+
+export const UsingCustomToolbarBulkAction = () => {
+
+	/**
+	 * Condition to detect Verify action
+	 */
+	const isVerifyAction = R.allPass([R.propEq('type', 'custom.verify'), isDocument]);
+
+	/**
+	 * Form submit handler for Verify action. It sends form data along with selected records ids
+	 */
+	const VerifyFormSubmitHandler = (props) => {
+		const {actionLink, data, fields = {}, selected} = props;
+
+		const parsedFormData = parseFormData(data, fields);
+
+		const payload = {ids: selected.map(s => s.id), formData: parsedFormData};
+
+		return actionLink && submitRequest(actionLink, payload, 'POST');
+	};
+
+	/**
+	 * Customized form submit handler mapper with Verify action condition added
+	 */
+	const DomainFormSubmitHandlerMapper = R.cond([
+		[isVerifyAction, R.always(VerifyFormSubmitHandler)],
+		[R.T, DefaultFormSubmitHandlerMapper]
+	]);
+
+	/**
+	 * Verify action definition
+	 */
+	const VerifyAction = (props) => withActionView({
+		...props,
+		title: "Verify",
+		submitLabel: "Verify",
+		ViewForm: R.compose(withFormCleanup, withFormSubmitAction)(DefaultViewForm),
+		viewLinkFn: ({_links: actionLinks}) => getLinkByRel(actionLinks, 'view'),
+	}, () => null);
+
+	/**
+	 * Custom action mapper with added condition for Verify domain action
+	 */
+	const DomainActionMapper = R.curry((settings = {}, action) => {
+		return R.cond([
+			[isVerifyAction, R.always(VerifyAction(settings))],
+			[R.T, action => DefaultActionMapper(settings, action)],
+		])(action);
+	});
+
+	const settings = {
+		variant: 'dialog',
+		fullScreen: true,
+		maxWidth: 'xl',
+		innerMaxWidth: 'lg',
+		margin: 'dense',
+		Layout: TwoColumnsLayout
+	};
+
+	/**
+	 * Action factory component with redefined ActionMapper and FormSubmitHandlerMapper components
+	 */
+	const ActionFactory =
+		new DefaultActionFactory(settings, DomainActionMapper, DomainFormSubmitHandlerMapper);
+
+
+	/**
+	 * Custom Grid View factory with the custom bulk action
+	 */
+	const GridViewFactory = (props) => {
+
+		const ComposedGridView = R.compose(
+			withSnackbar,
+			withGridViewConfigLoader,
+			withGridViewSettings(defaultGridViewSettings),
+			withGridViewDefaultActions,
+			withGridViewModelBulkActions,
+			withGridCustomBulkAction,
+			withGridViewActionExecutor,
+			withGridViewDataLoader,
+			withGridViewSorting,
+			withGridViewSelection,
+			withGridViewPagination,
+		)(GridView);
+
+		return (
+			<ComposedGridView {...props}/>
+		);
+	};
+
+	const DomainComponentMapping = R.cond([
+		[R.propEq('type', 'grid'), GridViewFactory],
+	]);
+
+	/**
+	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
+	 */
+	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props);
+
+	return (
+		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page14"
+				 ActionFactory={ActionFactory}
+				 ComponentFactory={DomainComponentFactory}/>
 	);
 };

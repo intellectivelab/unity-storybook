@@ -358,6 +358,86 @@ mapper into a constructor:
 
 <br/>
 
+## Example - Custom toolbar bulk actions
+
+This example shows how to replace default bulk actions renderer with custom one for a Grid View component.
+Sometimes it can be useful if for example only custom bulk action is configured and selected records don't have a corresponding link.
+
+### Steps
+
+We well be using the same action `Verify` action from the [Example - Custom toolbar bulk action with configured view](#example---custom-toolbar-bulk-action-with-configured-view)
+but with custom bulk actions rendering logic. To render custom bulk actions we create High Ordered Component (HOC) for the grid
+and replace default bulk actions with Button component for `custom.verify` action type:
+```jsx
+const withGridCustomBulkAction = R.curry((WrappedGrid, props) => {
+	const {actions = [], id} = props;
+
+	const dispatch = useDispatch();
+
+	const selected = useSelector(R.path(["grids", id, "selected"]));
+
+	const handleActionClick = (action, selected = []) => {
+		dispatch(grids.updateGridCurrentAction(id, {action, selected}));
+	};
+
+	const customAction = R.find(R.propEq("type", "custom.verify"), actions);
+
+	const bulkActions = customAction ? [
+		<Button
+			name={customAction.name}
+			variant="contained"
+			size="medium"
+			color="primary"
+			tabIndex="0"
+			onClick={() => handleActionClick(customAction, selected)} role="button">
+			{customAction.label}
+		</Button>
+	] : [];
+
+	return <WrappedGrid {...props} bulkActions={bulkActions}/>;
+});
+```
+Implement a custom factory component for the GridView component where we add withGridCustomBulkAction HOC.
+
+```jsx
+const GridViewFactory = (props) => {
+
+    const ComposedGridView = R.compose(
+        withSnackbar,
+        withGridViewConfigLoader,
+        withGridViewSettings(defaultGridViewSettings),
+        withGridViewDefaultActions,
+        withGridViewModelBulkActions,
+        withGridCustomBulkAction,
+        withGridViewActionExecutor,
+        withGridViewDataLoader,
+        withGridViewSorting,
+        withGridViewSelection,
+        withGridViewPagination,
+    )(GridView);
+
+    return (
+        <ComposedGridView {...props}/>
+    );
+};
+```
+
+Create mapping conditions for the domain components.
+
+```jsx
+const DomainComponentMapping = R.cond([
+    [R.propEq('type', 'grid'), GridViewFactory],
+]);
+```
+
+Implement the domain component factory in the way that the domain component mapping comes first.
+
+```jsx
+const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+```
+
+<br/>
+
 ## Example - Custom column renderer
 
 This example shows how to customize a Grid View component with adding a custom column rendering logic.
