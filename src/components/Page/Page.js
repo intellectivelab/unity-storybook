@@ -1,9 +1,10 @@
 import React from 'react';
 
-import {DefaultThemeProvider, FactoryContextProvider} from '@intellective/core';
 import {HashRouter as Router} from "react-router-dom";
 
-import PageContainer from "./PageContainer";
+import {DefaultThemeProvider, FactoryContextProvider} from '@intellective/core';
+
+import PageContainer from "../PageContainer/PageContainer";
 
 export default (props) => {
 	const {href, ThemeProvider = DefaultThemeProvider, ...otherProps} = props;

@@ -8,7 +8,7 @@ import Alert from "@material-ui/lab/Alert";
 import CreateIcon from "@material-ui/icons/Create";
 import Typography from "@material-ui/core/Typography";
 
-import AppPage from "../../components/AppPage/AppPage";
+import Page from "../../components/Page/Page";
 
 import {
 	CreateCaseAttachmentsPage,
@@ -143,7 +143,7 @@ export const UsingFormFieldValidation = () => {
 	}
 
 	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+		<Page href="/api/1.0.0/config/perspectives/search/dashboards/page12"
 		         ActionFactory={new DomainActionFactory()}
 		         ComponentFactory={DomainComponentFactory}
 		/>
@@ -185,7 +185,7 @@ export const UsingFormSubmitHandler = () => {
 	}
 
 	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+		<Page href="/api/1.0.0/config/perspectives/search/dashboards/page12"
 		         ActionFactory={new DomainActionFactory()}
 		         ComponentFactory={DomainComponentFactory}
 		/>
@@ -287,7 +287,7 @@ export const UsingFormValidation = () => {
 	}
 
 	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+		<Page href="/api/1.0.0/config/perspectives/search/dashboards/page12"
 		         ActionFactory={new DomainActionFactory()}
 		         ComponentFactory={DomainComponentFactory}
 		/>

@@ -40,7 +40,7 @@ import {
 	withGridViewSorting
 } from "@intellective/core";
 
-import AppPage from "../../components/AppPage/AppPage";
+import Page from "../../components/Page/Page";
 
 export default {title: 'Examples/Grid View'};
 
@@ -53,7 +53,7 @@ const {clearFormState, updateFieldValue, updateFormState} = forms;
 /*
 * Add custom toolbar action to the grid component
 */
-export const UsingCustomToolbarAction = () => {
+export const UsingToolbarAction = () => {
 
 	/**
 	 * Custom action that prints "Hello World" message below the grid
@@ -117,7 +117,7 @@ export const UsingCustomToolbarAction = () => {
 	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props);
 
 	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1"
+		<Page href="/api/1.0.0/config/perspectives/search/dashboards/page1"
 		         ComponentFactory={DomainComponentFactory}/>
 	);
 };
@@ -143,7 +143,7 @@ const withFormCleanup = R.curry((WrappedComponent, props) => {
 /*
 * Add toolbar bulk action with configured view to the grid component
 */
-export const UsingCustomBulkAction = () => {
+export const UsingBulkAction = () => {
 	/**
 	 * Condition to detect Verify action
 	 */
@@ -224,7 +224,7 @@ export const UsingCustomBulkAction = () => {
 		new DefaultActionFactory(settings, DomainActionMapper, DomainFormSubmitHandlerMapper);
 
 	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page14"
+		<Page href="/api/1.0.0/config/perspectives/search/dashboards/page14"
 		         ActionFactory={ActionFactory}/>
 	);
 };
@@ -232,7 +232,7 @@ export const UsingCustomBulkAction = () => {
 /*
 * Add custom toolbar bulk action with custom view to the grid component
 */
-export const UsingCustomBulkActionWithCustomView = () => {
+export const UsingBulkActionWithView = () => {
 	/**
 	 * Condition to detect Verify action
 	 */
@@ -361,7 +361,7 @@ export const UsingCustomBulkActionWithCustomView = () => {
 	const ActionFactory = new DefaultActionFactory(settings, DomainActionMapper, DomainFormSubmitHandlerMapper);
 
 	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page14"
+		<Page href="/api/1.0.0/config/perspectives/search/dashboards/page14"
 		         ActionFactory={ActionFactory}/>
 	);
 };

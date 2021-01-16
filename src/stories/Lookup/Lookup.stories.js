@@ -4,10 +4,10 @@ import * as R from "ramda";
 
 import {DefaultFormFieldFactory, forms, LookupField} from "@intellective/core";
 
-import AppPage from "../../components/AppPage/AppPage";
+import Page from "../../components/Page/Page";
 import {useDispatch} from "react-redux";
 
-export default {title: 'Examples/Lookup Field'};
+export default {title: 'Examples/Lookup'};
 
 const withSelectionHandler = R.curry((formId, fieldId, WrappedField, props) => {
 	const dispatch = useDispatch();
@@ -51,7 +51,7 @@ const DomainFieldMapper = R.cond([
 const DomainFormFieldFactory = (props) => DomainFieldMapper(props) || DefaultFormFieldFactory(props)
 
 export const UsingLookupSelection = () => {
-	return <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
-	                FormFieldFactory={DomainFormFieldFactory}/>;
+	return <Page href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+	             FormFieldFactory={DomainFormFieldFactory}/>;
 }
 

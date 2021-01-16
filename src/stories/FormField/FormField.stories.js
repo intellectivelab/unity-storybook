@@ -15,7 +15,7 @@ import OpenInNewIcon from "@material-ui/icons/OpenInNew";
 
 import {AutocompleteField, DefaultFormFieldFactory, UrlField} from "@intellective/core";
 
-import AppPage from "../../components/AppPage/AppPage";
+import Page from "../../components/Page/Page";
 import MaskedInput from "react-text-mask/dist/reactTextMask";
 
 export default {title: "Examples/Form Field"};
@@ -48,7 +48,7 @@ export const UsingRatingField = () => {
         DefaultFormFieldFactory
     )(props);
 
-    return <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+    return <Page href="/api/1.0.0/config/perspectives/search/dashboards/page12"
                     FormFieldFactory={DomainFormFieldFactory}/>;
 }
 
@@ -94,10 +94,9 @@ export const UsingFieldAdornment = () => {
 
     const DomainFormFieldFactory = (props) => DomainFieldMapper(props) || DefaultFormFieldFactory(props);
 
-    return <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+    return <Page href="/api/1.0.0/config/perspectives/search/dashboards/page12"
                     FormFieldFactory={DomainFormFieldFactory}/>;
 }
-
 
 const TextMaskCustom = props => {
     const {inputRef, mask, guide = false, showMask = true, ...other} = props;
@@ -139,6 +138,6 @@ export const UsingPhoneField = () => {
 
     const DomainFormFieldFactory = (props) => DomainFieldMapper(props) || DefaultFormFieldFactory(props);
 
-    return <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+    return <Page href="/api/1.0.0/config/perspectives/search/dashboards/page12"
                     FormFieldFactory={DomainFormFieldFactory}/>;
 };
