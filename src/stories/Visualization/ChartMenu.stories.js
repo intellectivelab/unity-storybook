@@ -84,7 +84,7 @@ export const UsingChartSettings = () => {
 		const xyFunctor = (x, y) => ({x, y});
 
 		const useDomainChartMapper = R.cond([
-			[R.equals('vComposite'), R.always(R.pair(VerticalPlotChart, xyPlotDataReducer(xyFunctor, null)))],
+			[R.propEq("type", 'vComposite'), R.always(R.pair(VerticalPlotChart, xyPlotDataReducer(xyFunctor, null)))],
 			[R.T, useChartComponentMapper]
 		]);
 
