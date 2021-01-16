@@ -2,7 +2,7 @@ import React, {useRef} from "react";
 
 import * as R from "ramda";
 
-import AppPage from "../../components/AppPage/AppPage";
+import Page from "../../components/Page/Page";
 
 import {
     Dashboard,
@@ -19,7 +19,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 
 export default {title: 'Examples/Page Layout'};
 
-export const UsingCustomPageLayout = () => {
+export const UsingPageLayout = () => {
 
     const styles = () => ({
         root: {
@@ -80,6 +80,6 @@ export const UsingCustomPageLayout = () => {
     // Register custom page builder
     registerBuilder("custom", CustomPageBuilder);
 
-    return <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page13"
+    return <Page href="/api/1.0.0/config/perspectives/search/dashboards/page13"
                     ActionFactory={DefaultFormFieldFactory}/>;
 };

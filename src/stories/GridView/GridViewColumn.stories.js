@@ -30,14 +30,14 @@ import {
 	withGridViewSorting
 } from "@intellective/core";
 
-import AppPage from "../../components/AppPage/AppPage";
+import Page from "../../components/Page/Page";
 
 export default {title: 'Examples/Grid View'};
 
 /*
 * Add custom column renderer
 */
-export const UsingCustomColumnRenderer = () => {
+export const UsingColumnRenderer = () => {
 
 	const mapValue = R.cond([
 		[R.is(Array), R.map(R.when(R.is(Object), R.prop('value')))],
@@ -115,7 +115,7 @@ export const UsingCustomColumnRenderer = () => {
 	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props);
 
 	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+		<Page href="/api/1.0.0/config/perspectives/search/dashboards/page12"
 		         ComponentFactory={DomainComponentFactory}/>
 	);
 };
@@ -123,7 +123,7 @@ export const UsingCustomColumnRenderer = () => {
 /*
 * Add custom column action
 */
-export const UsingCustomColumnAction = () => {
+export const UsingColumnAction = () => {
 
 	/**
 	 * Custom action that invokes download action on fullName column click instead of view action
@@ -188,7 +188,7 @@ export const UsingCustomColumnAction = () => {
 	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props);
 
 	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1"
+		<Page href="/api/1.0.0/config/perspectives/search/dashboards/page1"
 				 ComponentFactory={DomainComponentFactory}/>
 	);
 };
@@ -222,7 +222,7 @@ const withUseCustomCellRenderer = R.curry((WrappedGrid, props) => {
 /*
 * Add custom row click handler
 */
-export const UsingCustomColumnClickHandler = () => {
+export const UsingColumnClickHandler = () => {
 
 	/**
 	 * Custom Grid View factory with double click handler addition
@@ -256,7 +256,7 @@ export const UsingCustomColumnClickHandler = () => {
 	const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props);
 
 	return (
-		<AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page1"
+		<Page href="/api/1.0.0/config/perspectives/search/dashboards/page1"
 				 ComponentFactory={DomainComponentFactory}
 		/>
 	);
