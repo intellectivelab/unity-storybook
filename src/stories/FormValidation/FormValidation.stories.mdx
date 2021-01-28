@@ -22,7 +22,7 @@ The component implements asynchronous variant of validation.
 This component serves as an example of the form field validator and should not be used as-is in any projects.
 
 ```jsx
-const useAsyncTaskIdValidator = (inputRef, value, field) => {
+const useAsyncTaskIdValidator = ({value}) => {
 
     const [validationResult, updateValidationResult] = useState({error: false});
 
@@ -39,15 +39,21 @@ const useAsyncTaskIdValidator = (inputRef, value, field) => {
 };
 ```
 
-Create a function that will be used as an extension (HOC) for the domain actions.
+Create a function that will be used as a React hook for usage of the domain actions.
 
 ```jsx
 const domainFieldValidators = R.cond([
-    [R.propEq("id", "task_id"), R.always(useAsyncTaskIdValidator)],
-    [R.propEq("id", "case_status"), R.always(() => ({error: false}))],
+    [R.propEq("id", "task_id"), useAsyncTaskIdValidator],
+    [R.propEq("id", "case_status"), useNoValidation],
+    [R.T, useDefaultFormFieldValidation],
 ]);
+```
 
-const withCustomFieldValidation = withDomainFormFieldValidation(domainFieldValidators);
+Create a function that will be used as an extension (HOC) for the domain actions.
+```jsx
+const withCustomFieldValidation = R.curry((WrappedComponent, props) =>
+    <WrappedComponent {...props} useFieldValidation={domainFieldValidators}/>
+);
 ```
 
 Extend the default create case action with the custom validators.
@@ -107,7 +113,7 @@ const DomainCreateCaseSubmitHandler = R.pipe(
 
         return new Promise((resolve, reject) => resolve(request));
     },
-    R.andThen(DefaultCreateCaseSubmitHandler)
+    R.andThen(DefaultCaseSubmitHandler)
 );
 ```
 
