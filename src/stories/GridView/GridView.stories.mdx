@@ -380,36 +380,17 @@ const withGridCustomBulkAction = R.curry((WrappedGrid, props) => {
 	return <WrappedGrid {...props} bulkActions={bulkActions}/>;
 });
 ```
-Implement a custom factory component for the GridView component where we add withGridCustomBulkAction HOC.
+Extend default GridView component with withGridCustomBulkAction HOC
 
 ```jsx
-const GridViewFactory = (props) => {
-
-    const ComposedGridView = R.compose(
-        withSnackbar,
-        withGridViewConfigLoader,
-        withGridViewSettings(defaultGridViewSettings),
-        withGridViewDefaultActions,
-        withGridViewModelBulkActions,
-        withGridCustomBulkAction,
-        withGridViewActionExecutor,
-        withGridViewDataLoader,
-        withGridViewSorting,
-        withGridViewSelection,
-        withGridViewPagination,
-    )(GridView);
-
-    return (
-        <ComposedGridView {...props}/>
-    );
-};
+const Component = withGridViewPrintAction(GridView);
 ```
 
 Create mapping conditions for the domain components.
 
 ```jsx
 const DomainComponentMapping = R.cond([
-    [R.propEq('type', 'grid'), GridViewFactory],
+    [R.propEq('type', 'grid'), (props) => <DefaultGridViewFactory {...props} Component={Component}/>],
 ]);
 ```
 

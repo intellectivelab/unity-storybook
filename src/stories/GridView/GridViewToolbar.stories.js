@@ -452,7 +452,7 @@ export const UsingCustomToolbarBulkAction = () => {
     const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props);
 
     return (
-        <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page14"
+        <Page href="/api/1.0.0/config/perspectives/search/dashboards/page14"
                  ActionFactory={ActionFactory}
                  ComponentFactory={DomainComponentFactory}/>
     );
