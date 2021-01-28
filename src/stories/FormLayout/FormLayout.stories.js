@@ -2,7 +2,7 @@ import React from 'react';
 
 import * as R from "ramda";
 
-import AppPage from "../../components/AppPage/AppPage";
+import Page from "../../components/Page/Page";
 
 import {CreateCaseWithAttachments, DefaultActionFactory, DefaultActionMapper, OneColumnLayout, ThreeColumnsLayout} from "@intellective/core";
 
@@ -57,7 +57,7 @@ export const UsingDefaultLayout = () => {
 	};
 
 	return (
-		<AppPage ActionFactory={new DomainActionFactory(actionViewSettings)}
+		<Page ActionFactory={new DomainActionFactory(actionViewSettings)}
 		         href="/api/1.0.0/config/perspectives/search/dashboards/page12"/>
 	);
 };
@@ -117,6 +117,6 @@ export const UsingCustomLayout = () => {
 		Layout: CustomFormLayout
 	};
 
-	return <AppPage href="/api/1.0.0/config/perspectives/search/dashboards/page12"
+	return <Page href="/api/1.0.0/config/perspectives/search/dashboards/page12"
 	                ActionFactory={new DefaultActionFactory(actionViewSettings)}/>;
 };

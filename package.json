@@ -8,18 +8,21 @@
     "build-storybook": "build-storybook -s public"
   },
   "dependencies": {
-    "@intellective/core": "2020.1.1",
-    "@intellective/unity-api-mocks": "^1.0.6",
-    "@material-ui/core": "^4.11.0",
-    "@material-ui/icons": "^4.9.1",
-    "@material-ui/lab": "^4.0.0-alpha.56",
-    "@material-ui/styles": "^4.10.0",
+    "@intellective/core": "2021.1.0-alpha.9",
+    "@intellective/analytics": "2021.1.0",
+    "@intellective/unity-api-mocks": "^1.0.9",
+    "@material-ui/core": "^4.11.2",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/styles": "^4.11.2",
+    "@material-ui/lab": "^4.0.0-alpha.57",
     "ramda": "^0.27.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-is": "^17.0.1",
     "react-redux": "^7.2.1",
-    "react-scripts": "^4.0.0",
+    "react-router-dom": "^5.2.0",
+    "react-router-redux": "^4.0.8",
+    "react-scripts": "^4.0.1",
     "react-text-mask": "^5.4.3"
   },
   "devDependencies": {
