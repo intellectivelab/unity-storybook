@@ -12,7 +12,7 @@ const useCustomUserLinks = record => R.mergeDeepRight(record, {_links: {'custom.
 
 module.exports = function (app) {
 	unityApiMocks.configApi(app, config);
-	unityApiMocks.usersApi(app, config, [], useCustomUserLinks);
+	unityApiMocks.usersApi(app, config, undefined, useCustomUserLinks);
 	unityApiMocks.contentApi(app, config);
 	unityApiMocks.casesApi(app, config);
 	unityApiMocks.foldersApi(app, config);
