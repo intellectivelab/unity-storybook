@@ -73,8 +73,8 @@ export const UsingFormFieldValidation = () => {
     };
 
     const domainFieldValidators = R.cond([
-        [R.propEq("id", "task_id"), useAsyncTaskIdValidator],
-        [R.propEq("id", "case_status"), useNoValidation],
+        [R.propEq("id", "task_id"), R.always(useAsyncTaskIdValidator)],
+        [R.propEq("id", "case_status"), R.always(useNoValidation)],
         [R.T, useDefaultFormFieldValidation],
     ]);
 
