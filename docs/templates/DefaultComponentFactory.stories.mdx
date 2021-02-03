@@ -8,25 +8,15 @@ import { Meta } from '@storybook/addon-docs/blocks';
 const DefaultComponentFactory = R.cond([
 	[R.propEq('type', 'grid'), DefaultGridViewFactory],
 	[R.propEq('type', 'criteria'), DefaultCriteriaFactory],
-	[R.propEq('type', 'treeView'), DefaultFolderTreeViewFactory],
 	[R.propEq('type', 'activityFeed'), DefaultActivityFeedFactory],
 	[R.propEq('type', 'searchTemplate'), DefaultSearchTemplateFactory],
-	[R.propEq('type', 'viewTabSearchTemplate'), DefaultViewTabSearchTemplateFactory],
-	[R.propEq('type', 'chart'), DefaultChartFactory],
-	[R.propEq('type', 'indicator'), DefaultIndicatorFactory],
-	[R.propEq('type', 'iframe'), DefaultIframeViewFactory],
-	[R.propEq('type', 'rtfTextEditor'), DefaultRtfEditorFactory],
+	[R.propEq('type', 'viewTabSearchTemplate'), DefaultViewTabSearchTemplateFactory]
 ]);
 ```
 ### Links
 
 * [DefaultGridViewFactory](/?path=/docs/templates-components-gridview--page)
 * [DefaultCriteriaFactory](/?path=/docs/templates-components-criteria--page)
-* [DefaultFolderTreeViewFactory](/?path=/docs/templates-components-foldertreeview--page)
 * [DefaultActivityFeedFactory](/?path=/docs/templates-components-activityfeedview--page)
 * [DefaultSearchTemplateFactory](/?path=/docs/templates-components-searchtemplate--page)
 * [DefaultViewTabSearchTemplateFactory](/?path=/docs/templates-components-viewtabsearchtemplate--page)
-* [DefaultChartFactory](/?path=/docs/templates-components-chart--page)
-* [DefaultIndicatorFactory](/?path=/docs/templates-components-indicator--page)
-* [DefaultIframeViewFactory](/?path=/docs/templates-components-iframeview--page)
-* [DefaultRtfEditorFactory](/?path=/docs/templates-components-rtfeditor--page)

@@ -12,7 +12,8 @@ const DefaultCriteriaFactory = (props) => {
 	const ComposedCriteria = R.compose(
 		withCriteriaConfigLoader,
 		withCriteriaDefaultValues,
-		withCriteriaDefaultActions,
+		withCriteriaPrimaryToolbar,
+		withCriteriaSecondaryToolbar,
 		R.when(R.always(draggable), withCriteriaDragAndDrop)
 	)(Component);
 

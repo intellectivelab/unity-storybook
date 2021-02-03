@@ -1,27 +1,30 @@
-import { Meta } from '@storybook/addon-docs/blocks';
+import {Meta} from '@storybook/addon-docs/blocks';
 
-<Meta title="Templates/Components/ActivityFeedView" />
+<Meta title="Templates/Components/ActivityFeedView"/>
 
 # Default Activity Feed Factory
 
 ```jsx
 const DefaultActivityFeedFactory = (props) => {
 
-	const {id, component = ActivityFeed, _links, children, ...otherProps} = props;
+	const {id, Activity = ActivityFeed, Timeline = TimelineView, _links, children, ...otherProps} = props;
 
 	const defaultSorting = [{column: "eventDate", direction: "DESC"}];
 
-	const ComposedActivityFeed = R.compose(
-		withActivityFeedConfigLoader,
-		withListQueryLoader(_links, defaultSorting),
-		withActivityFeedActions,
-		withActivityFeedQuickSearch
-	)(component);
+	const _Activity = withListQueryLoader(Activity);
+	const _Timeline = withListQueryLoader(Timeline);
 
 	return (
-		<ComposedActivityFeed {...otherProps} id={id} _links={_links}>
+		<DefaultActivityFeedContainer {...otherProps}
+		                              id={id}
+		                              queryLink={_links.query}
+		                              sorting={defaultSorting}
+		                              Activity={_Activity}
+		                              Timeline={_Timeline}
+		                              _links={_links}
+		>
 			{children}
-		</ComposedActivityFeed>
+		</DefaultActivityFeedContainer>
 	);
 };
 ```

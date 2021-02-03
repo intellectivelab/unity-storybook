@@ -1,22 +1,19 @@
-import { Meta } from '@storybook/addon-docs/blocks';
+import {Meta} from '@storybook/addon-docs/blocks';
 
-<Meta title="Templates/Components/SearchTemplate" />
+<Meta title="Templates/Components/SearchTemplate"/>
 
 # Default Search Template Factory
 
 ```jsx
 const DefaultSearchTemplateFactory = props => {
 
-	const {Component = SearchTemplate, children, ...otherProps} = props;
+	const {Component = SearchTemplate, ...otherProps} = props;
 
-	const ComposedQuickSearch = R.compose(withQuickSearchCriteriaFields, withQuickSearchCategories)(QuickSearch);
-
-	const ComposedSearchTemplate = R.compose(withSearchTemplateConfigLoader)(Component);
+	const QuickSearchComposed = R.compose(withQuickSearchCriteria, withQuickSearchFields)(QuickSearch);
+	const SearchTemplateComposed = R.compose(withSearchTemplateConfigLoader)(Component);
 
 	return (
-		<ComposedSearchTemplate {...otherProps} QuickSearchComponent={ComposedQuickSearch} clipToViewport>
-			{children}
-		</ComposedSearchTemplate>
+		<SearchTemplateComposed {...otherProps} QuickSearchComponent={QuickSearchComposed}/>
 	);
 };
 ```
