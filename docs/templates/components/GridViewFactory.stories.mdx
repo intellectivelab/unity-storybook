@@ -27,6 +27,7 @@ const DefaultGridViewFactory = (props) => {
 		withGridViewDomainActions, //load domain grid actions from the Unity configuration
 		withGridViewDetailView, //add detail view mode
 		withGridViewDropZone(dropZoneSettings), //turn the grid into drop area
+		withGridViewMediaQueries, //add responsiveness
 	)(Component);
 
 	return (

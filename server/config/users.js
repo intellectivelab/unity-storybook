@@ -1,34 +1,6 @@
 module.exports = {
-    "usersSearchWithVerifyAction": {
-        "id": "usersSearchWithVerifyAction",
-        "title": "Users Search With Verify Action",
-        "resourceName": "documents",
-        "resourceType": "User",
-        "_links": {
-            "self": {
-                "href": "/api/config/components/usersSearchWithVerifyAction",
-                "type": "application/json"
-            },
-            "criteria": {
-                "href": "/api/config/components/usersSearchCriteria",
-                "type": "application/json"
-            },
-            "grid": {
-                "href": "/api/config/components/usersWithVerifyAction",
-                "type": "application/json"
-            },
-            "query": {
-                "href": "/api/users/query",
-                "type": "application/json"
-            },
-            "list": {
-                "href": "/api/users/list",
-                "type": "application/json"
-            },
-        }
-    },
-    "usersWithVerifyAction": {
-        "id": "usersWithVerifyAction",
+    "usersGrid": {
+        "id": "usersGrid",
         "title": "Users",
         "ui": "infinite",
         "columns": [
@@ -201,17 +173,17 @@ module.exports = {
         ],
         "_links": {
             "self": {
-                "href": "/api/config/components/usersWithVerifyAction",
+                "href": "/api/config/components/usersGrid",
                 "type": "application/json"
             },
             "actions": {
-                "href": "/api/config/grids/usersWithVerifyAction/actions",
+                "href": "/api/config/grids/usersGrid/actions",
                 "type": "application/json"
             }
         }
     },
-    "usersVerifyView": {
-        "id": "usersVerifyView",
+    "UserView": {
+        "id": "UserView",
         "resourceName": "documents",
         "resourceType": "Employee",
         "viewType": "Open",
@@ -223,52 +195,64 @@ module.exports = {
             "fieldSetId": "usersViewFieldsetVerify",
             "_links": {
                 "root": {
-                    "href": "/api/config/components/usersVerifyView",
+                    "href": "/api/config/components/UserView",
                     "type": "application/json"
                 },
                 "self": {
-                    "href": "/api/config/components/usersVerifyView/tabs/1",
+                    "href": "/api/config/components/UserView/tabs/1",
                     "type": "application/json"
                 },
                 "actions": {
-                    "href": "/api/config/components/usersVerifyView/tabs/1/actions",
+                    "href": "/api/config/components/UserView/tabs/1/actions",
                     "type": "application/json"
                 },
                 "fieldset": {
-                    "href": "/api/config/components/usersVerifyViewFieldset",
+                    "href": "/api/config/components/UserViewFieldset",
                     "type": "application/json"
                 }
             }
         }],
         "_links": {
             "self": {
-                "href": "/api/config/components/usersVerifyView",
+                "href": "/api/config/components/UserView",
                 "type": "application/json"
             },
             "header": {
-                "href": "/api/config/components/usersVerifyView/header",
+                "href": "/api/config/components/UserView/header",
                 "type": "application/json"
             }
         }
     },
-    "usersVerifyViewFieldset": {
-        "header": [
-        ],
+    "UserViewFieldset": {
+	    "header": [
+		    {
+			    "name": "fullName",
+			    "label": "Name",
+			    "dataType": "string",
+		    },
+		    {
+			    "name": "gender",
+			    "label": "Gender",
+		    },
+		    {
+			    "name": "dob",
+			    "label": "Date of Birth",
+			    "dataType": "date",
+		    },
+		    {
+			    "name": "salary",
+			    "label": "Salary",
+			    "dataType": "number",
+			    "format": "$+1,000.00",
+		    },
+	    ],
         "fields": [
-            {
-                "name": "country",
-                "label": "Country",
-                "dataType": "string",
-                "selectorId": 'country',
-                "required": false,
-                "width": 200,
-                "tooltip": "",
-                "_links": {
-                    "selector": {
-                        "href": '/api/selectors/country'
-                    },
-                }
-            },
+	        {
+		        "name": "fullName",
+		        "label": "Name",
+		        "dataType": "string",
+		        "fullWidth": true
+	        },
             {
                 "name": "gender",
                 "label": "Gender",
@@ -280,31 +264,72 @@ module.exports = {
                 "width": 100,
                 "tooltip": ""
             },
-            {
-                "name": "age",
-                "label": "Age",
-                "dataType": "int",
-                "readOnly": false,
-                "minValue": 14,
-                "maxValue": 150,
-                "tooltip": ""
-            },
+	        {
+		        "name": "dob",
+		        "label": "Date of Birth",
+		        "dataType": "date",
+		        "required": true,
+		        "favorite": true,
+		        "minValue": "1900/01/01",
+		        "maxValue": "2050/06/01",
+		        "multiValue": true,
+		        "width": 100,
+		        "tooltip": ""
+	        },
             {
                 "name": "retire",
                 "ui": "rtflabel",
                 "label": '[{"children":[{"type":"link","url":"https://en.wikipedia.org/wiki/Retirement","children":[{"text":"Retired"}]}]}]',
                 "dataType": "boolean",
                 "tooltip": ""
-            }
+            },
+	        {
+		        "name": "country",
+		        "label": "Country",
+		        "dataType": "string",
+		        "selectorId": 'country',
+		        "colSpan": 2,
+		        "_links": {
+			        "selector": {
+				        "href": '/api/selectors/country'
+			        },
+		        }
+	        },
         ],
         "sections": [
+	        {
+		        "title": "Company",
+		        "expanded": true,
+		        "fields": [
+			        {
+				        "name": "companyName",
+				        "label": "Company",
+				        "dataType": "string",
+				        "width": 200,
+				        "tooltip": ""
+			        },
+			        {
+				        "name": "jobType",
+				        "label": "Job",
+				        "dataType": "string",
+				        "width": 200,
+				        "tooltip": ""
+			        },
+			        {
+				        "name": "salary",
+				        "label": "Salary",
+				        "dataType": "number",
+				        "favorite": true,
+				        "format": "$+1,000.00",
+			        },
+		        ],
+	        },
         ],
         "_links": {
             "self": {
-                "href": "/api/config/components/usersVerifyViewFieldset",
+                "href": "/api/config/components/UserViewFieldset",
                 "type": "application/json"
             }
         }
-    },
-
+    }
 };

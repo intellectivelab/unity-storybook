@@ -5,15 +5,16 @@ import {Meta} from '@storybook/addon-docs/blocks';
 # Default View Search Template Factory
 
 ```jsx
+
+const ComposedQuickSearch = R.compose(withQuickSearchCriteria, withQuickSearchFields)(QuickSearch);
+
 const DefaultViewTabSearchTemplateFactory = props => {
 	const {Component = SearchTemplate, ...otherProps} = props;
 
-	const QuickSearchComponent = R.compose(withQuickSearchCriteria, withQuickSearchFields)(QuickSearch);
-
-	const ComposedComponent = R.compose(withSearchTemplateFormState)(Component);
+	const ComposedSearchTemplate = R.compose(withSearchTemplateFormState)(Component);
 
 	return (
-		<ComposedComponent {...otherProps} disablePin disableRecentHistory QuickSearchComponent={QuickSearchComponent}/>
+		<ComposedSearchTemplate {...otherProps} disablePin disableRecentHistory QuickSearchComponent={ComposedQuickSearch}/>
 	);
 };
 ```

@@ -7,24 +7,12 @@ import {Meta} from '@storybook/addon-docs/blocks';
 ```jsx
 const DefaultActivityFeedFactory = (props) => {
 
-	const {id, Activity = ActivityFeed, Timeline = TimelineView, _links, children, ...otherProps} = props;
+	const {_links} = props;
 
 	const defaultSorting = [{column: "eventDate", direction: "DESC"}];
 
-	const _Activity = withListQueryLoader(Activity);
-	const _Timeline = withListQueryLoader(Timeline);
-
 	return (
-		<DefaultActivityFeedContainer {...otherProps}
-		                              id={id}
-		                              queryLink={_links.query}
-		                              sorting={defaultSorting}
-		                              Activity={_Activity}
-		                              Timeline={_Timeline}
-		                              _links={_links}
-		>
-			{children}
-		</DefaultActivityFeedContainer>
+		<ActivityFeedView {...props} queryLink={_links.query} sorting={defaultSorting}/>
 	);
 };
 ```

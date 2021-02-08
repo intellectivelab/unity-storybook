@@ -2,6 +2,8 @@ import React, {useMemo} from 'react';
 
 import * as R from "ramda";
 
+import {FactoryContextProvider} from "@intellective/core";
+
 import {
 	AnalyticsComponentFactory,
 	DefaultChartContainer,
@@ -17,9 +19,9 @@ import {
 	xyPlotDataReducer
 } from "@intellective/analytics";
 
-import Page from "../../components/Page/Page";
+import PageContainer from "../../components/PageContainer/PageContainer";
 
-export default {title: 'Examples/Visualization/Chart Menu'};
+export default {title: 'Examples/Visualization/Chart/Settings'};
 
 const withDomainSunburstRenderer = R.curry((preferences, WrappedComponent, props) => {
 	const {hovered} = props;
@@ -52,7 +54,7 @@ const withSunburstSettings = R.curry((WrappedChart, props) => {
 	);
 });
 
-export const UsingChartMenu = () => {
+export const UsingCustomChartSettings = () => {
 
 	const useDomainChartMapper = R.cond([
 		[R.propEq("type", "sunburst"), R.always(R.pair(withSunburstSettings(Sunburst), sunburstDataReducer(null)))],
@@ -72,12 +74,13 @@ export const UsingChartMenu = () => {
 	]);
 
 	return (
-		<Page href="/api/1.0.0/config/perspectives/search/dashboards/sunburst_menu_page"
-		      ComponentFactory={DomainComponentFactory}/>
+		<FactoryContextProvider ComponentFactory={DomainComponentFactory}>
+			<PageContainer href="/api/config/perspectives/storybook/dashboards/sunburst_menu_page"/>
+		</FactoryContextProvider>
 	);
 };
 
-export const UsingChartSettings = () => {
+export const DisablingChartSettings = () => {
 
 	const withDomainChartSettings = R.curry((WrappedChart, props) => {
 
@@ -110,7 +113,8 @@ export const UsingChartSettings = () => {
 	]);
 
 	return (
-		<Page href="/api/1.0.0/config/perspectives/search/dashboards/custom_menu_page"
-		      ComponentFactory={DomainComponentFactory}/>
+		<FactoryContextProvider ComponentFactory={DomainComponentFactory}>
+			<PageContainer href="/api/config/perspectives/storybook/dashboards/custom_menu_page"/>
+		</FactoryContextProvider>
 	);
 };

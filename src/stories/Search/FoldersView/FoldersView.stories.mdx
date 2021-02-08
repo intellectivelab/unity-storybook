@@ -1,6 +1,6 @@
 import { Meta, Story, Preview, Props } from '@storybook/addon-docs/blocks';
 
-<Meta title="Examples/FolderTree View/README"/>
+<Meta title="Examples/Search/Folders/README"/>
 
 # Folder Tree View Examples
 
@@ -66,15 +66,10 @@ const FolderTreeViewFactory = (props) => {
 Create mapping conditions for the domain components.
 
 ```jsx
-const DomainComponentMapping = R.cond([
-        [R.propEq('type', 'treeView'), FolderTreeViewFactory],
-    ]);
-```
-
-Implement the domain component factory in the way that the domain component mapping comes first.
-
-```jsx
-const DomainComponentFactory = (props) => DomainComponentMapping(props) || DefaultComponentFactory(props)
+const DomainComponentFactory = R.cond([
+	[R.propEq('type', 'treeView'), FolderTreeViewFactory],
+	[R.T, DefaultComponentFactory]
+]);
 ```
 
 

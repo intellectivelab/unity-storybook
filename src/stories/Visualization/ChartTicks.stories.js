@@ -2,12 +2,15 @@ import React from 'react';
 
 import * as R from "ramda";
 
-import {AnalyticsComponentFactory, DefaultChartContainer, withChartConfigLoader} from "@intellective/analytics";
-
-import Page from "../../components/Page/Page";
 import Tooltip from "@material-ui/core/Tooltip";
 
-export default {title: 'Examples/Visualization/Tick Format'};
+import {FactoryContextProvider} from "@intellective/core";
+
+import {AnalyticsComponentFactory, DefaultChartContainer, withChartConfigLoader} from "@intellective/analytics";
+
+import PageContainer from "../../components/PageContainer/PageContainer";
+
+export default {title: 'Examples/Visualization/Chart/Ticks'};
 
 /*
 * Improve default charts with custom tickFormat
@@ -114,8 +117,9 @@ export const UsingTickFormat = () => {
 	]);
 
 	return (
-		<Page href="/api/1.0.0/config/perspectives/search/dashboards/ticks_page"
-		      ComponentFactory={DomainComponentFactory}/>
+		<FactoryContextProvider ComponentFactory={DomainComponentFactory}>
+			<PageContainer href="/api/config/perspectives/storybook/dashboards/ticks_page"/>
+		</FactoryContextProvider>
 	);
 };
 
