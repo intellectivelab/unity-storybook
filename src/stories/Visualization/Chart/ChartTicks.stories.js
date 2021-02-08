@@ -8,7 +8,7 @@ import {FactoryContextProvider} from "@intellective/core";
 
 import {AnalyticsComponentFactory, DefaultChartContainer, withChartConfigLoader} from "@intellective/analytics";
 
-import PageContainer from "../../components/PageContainer/PageContainer";
+import PageContainer from "../../../components/PageContainer/PageContainer";
 
 export default {title: 'Examples/Visualization/Chart/Ticks'};
 

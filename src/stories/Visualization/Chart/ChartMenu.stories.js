@@ -19,7 +19,7 @@ import {
 	xyPlotDataReducer
 } from "@intellective/analytics";
 
-import PageContainer from "../../components/PageContainer/PageContainer";
+import PageContainer from "../../../components/PageContainer/PageContainer";
 
 export default {title: 'Examples/Visualization/Chart/Settings'};
 
