@@ -15,7 +15,7 @@ import {
 	withGridViewDomainActions
 } from "@intellective/core";
 
-export default {title: 'Examples/Form/Rendering'};
+export default {title: 'Examples/Form/Conditions'};
 
 const DefaultGridViewFactory = (props) => {
 
