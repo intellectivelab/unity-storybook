@@ -73,5 +73,49 @@ module.exports = {
                 }
             }
         }
-    ]
+    ],
+	"casetasks": [
+		{
+			"name": "view",
+			"label": "View Details",
+			"tooltip": "View Details",
+			"resourceName": "workitems",
+			"type": "view",
+			"_links": {
+				"root": {
+					"href": "/api/config/actions",
+					"type": "application/json"
+				},
+				"self": {
+					"href": "/api/config/actions/view",
+					"type": "application/json"
+				}
+			}
+		},
+		{
+			"name": "createCase",
+			"label": "Create",
+			"tooltip": "Create new case",
+			"type": "create",
+			"resourceName": 'cases',
+			"_links": {
+				"root": {
+					"href": "/api/config/actions",
+					"type": "application/json"
+				},
+				"self": {
+					"href": "/api/config/actions/createCase",
+					"type": "application/json"
+				},
+				"model": {
+					"href": "/api/casetasks",
+					"type": "application/json"
+				},
+				"view": {
+					"href": "/api/config/components/casetasksView1",
+					"type": "application/json"
+				}
+			}
+		}
+	],
 };
