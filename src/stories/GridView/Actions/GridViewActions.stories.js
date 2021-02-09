@@ -33,7 +33,7 @@ import {
 	withGridViewDomainActions
 } from "@intellective/core";
 
-export default {title: 'Examples/Grid View/Actions'};
+export default {title: 'Examples/GridView/Actions'};
 
 const getLinkByRel = (_links, type, name) => _links && (_links[name] || _links[type] || {}).href;
 

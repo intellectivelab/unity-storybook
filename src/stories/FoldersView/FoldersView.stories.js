@@ -8,7 +8,7 @@ import {DefaultComponentFactory, FactoryContextProvider, folders, FolderTreeView
 
 import PageContainer from "../../components/PageContainer/PageContainer";
 
-export default {title: 'Examples/Folders View'};
+export default {title: 'Examples/FoldersView'};
 
 /**
  * Selects root folder by default

@@ -12,7 +12,7 @@ import {amber, purple} from '@material-ui/core/colors';
 
 import {grids, GridView, useDefaultColumnRenderer, withGridViewConfig, withGridViewDomainActions} from "@intellective/core";
 
-export default {title: 'Examples/Grid View/Columns'};
+export default {title: 'Examples/GridView/Columns'};
 
 const DefaultGridViewFactory = (props) => {
 
