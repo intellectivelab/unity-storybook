@@ -9,7 +9,6 @@ import {
 	DefaultActionMapper,
 	FactoryContextProvider,
 	GridView,
-	OneColumnLayout,
 	ResourceViewAction,
 	useDefaultFormFieldConditions,
 	withGridViewConfig,
@@ -47,7 +46,6 @@ const settings = {
 	margin: 'dense',
 	maxWidth: 'xl',
 	innerMaxWidth: 'lg',
-	Layout: OneColumnLayout
 };
 
 const useDomainFormFieldConditions = (field) => {
@@ -55,6 +53,8 @@ const useDomainFormFieldConditions = (field) => {
 	const {formId} = field;
 
 	const formData = useSelector(R.pathOr({}, ["forms", formId, "data"]));
+
+	const _field = useDefaultFormFieldConditions(field);
 
 	const shouldCaseIdBeReadOnly = (field) => {
 		const {id} = field;
@@ -68,11 +68,12 @@ const useDomainFormFieldConditions = (field) => {
 		return Number(taskId) === 0;
 	}
 
-	const _field = useDefaultFormFieldConditions(field);
-
-	return R.cond([
-		[shouldCaseIdBeReadOnly, R.over(R.lensProp('readOnly'), R.always(true))],
-	])(_field);
+	return R.compose(
+		R.when(
+			shouldCaseIdBeReadOnly,
+			R.over(R.lensProp('readOnly'), R.always(true))
+		)
+	)(_field);
 };
 
 /*
@@ -81,11 +82,13 @@ const useDomainFormFieldConditions = (field) => {
 export const UsingFieldConditions = () => {
 
 	const DomainActionMapper = R.curry((settings = {}, action) => {
+		const DomainResourceViewAction = ResourceViewAction({
+			...settings,
+			useFieldConditions: useDomainFormFieldConditions
+		});
+
 		return R.cond([
-			[R.propEq('type', 'view'), R.always(ResourceViewAction({
-				...settings,
-				useFieldConditions: useDomainFormFieldConditions
-			}))],
+			[R.propEq('type', 'view'), R.always(DomainResourceViewAction)],
 			[R.T, (action) => DefaultActionMapper(settings, action)]
 		])(action);
 	});

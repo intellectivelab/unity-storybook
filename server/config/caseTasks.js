@@ -1,5 +1,140 @@
 module.exports = {
+	"casetasksView0": {
+		"id": "DomainCase",
+		"resourceName": "documents",
+		"resourceType": "DomainCase",
+		"viewType": "Open",
+		"tabs": [
+			{
+				"id": "1",
+				"title": "Details",
+				"tooltip": "Case Details",
+				"type": "Details",
+				"fieldSetId": "casetasksViewFieldset0",
+				"_links": {
+					"root": {
+						"href": "/api/config/components/casetasksView0",
+						"type": "application/json"
+					},
+					"self": {
+						"href": "/api/config/components/casetasksView0/tabs/1",
+						"type": "application/json"
+					},
+					"actions": {
+						"href": "/api/config/components/casetasksView0/tabs/1/actions",
+						"type": "application/json"
+					},
+					"fieldset": {
+						"href": "/api/config/components/casetasksViewFieldset0",
+						"type": "application/json"
+					}
+				}
+			},
+			{
+				"id": "2",
+				"title": "Documents",
+				"tooltip": "Case Documents",
+				"type": "Attachments",
+				"_links": {
+					"root": {
+						"href": "/api/config/components/casetasksView0",
+						"type": "application/json"
+					},
+					"self": {
+						"href": "/api/config/components/casetasksView0/tabs/2",
+						"type": "application/json"
+					},
+					"actions": {
+						"href": "/api/config/components/casetasksView0/tabs/2/actions",
+						"type": "application/json"
+					},
+					"templates": {
+						"href": "/api/config/components/usersAsAttachmentsWithFolderView/templates",
+						"type": "application/json"
+					}
+				}
+			},
+			{
+				"id": "3",
+				"title": "Activity",
+				"tooltip": "Case History",
+				"type": "History",
+				"_links": {
+					"root": {
+						"href": "/api/config/components/usersView0",
+						"type": "application/json"
+					},
+					"self": {
+						"href": "/api/config/components/usersView0/tabs/3",
+						"type": "application/json"
+					},
+					"actions": {
+						"href": "/api/config/components/usersView0/tabs/3/actions",
+						"type": "application/json"
+					},
+					"templates": {
+						"href": "/api/config/components/historyTemplateSet/templates",
+						"type": "application/json"
+					}
+				}
+			}
+		],
+		"_links": {
+			"self": {
+				"href": "/api/config/components/casetasksView0",
+				"type": "application/json"
+			},
+			"header": {
+				"href": "/api/config/components/casetasksView0/header",
+				"type": "application/json"
+			}
+		}
+	},
+	"casetasksView1": {
+		"id": "DomainCase",
+		"resourceName": "documents",
+		"resourceType": "DomainCase",
+		"viewType": "Open",
+		"tabs": [
+			{
+				"id": "1",
+				"title": "Details",
+				"tooltip": "Case Details",
+				"type": "Details",
+				"fieldSetId": "casetasksViewFieldset1",
+				"_links": {
+					"root": {
+						"href": "/api/config/components/casetasksView1",
+						"type": "application/json"
+					},
+					"self": {
+						"href": "/api/config/components/casetasksView1/tabs/1",
+						"type": "application/json"
+					},
+					"actions": {
+						"href": "/api/config/components/casetasksView1/tabs/1/actions",
+						"type": "application/json"
+					},
+					"fieldset": {
+						"href": "/api/config/components/casetasksViewFieldset1",
+						"type": "application/json"
+					}
+				}
+			}
+		],
+		"_links": {
+			"self": {
+				"href": "/api/config/components/casetasksView1",
+				"type": "application/json"
+			},
+			"header": {
+				"href": "/api/config/components/casetasksView1/header",
+				"type": "application/json"
+			}
+		}
+	},
 	"casetasksViewFieldset0": {
+		"columns": 1,
 		"fields": [
 			{
 				"name": "task_id",
@@ -71,6 +206,7 @@ module.exports = {
 		}
 	},
 	"casetasksViewFieldset1": {
+		"columns": 1,
 		"fields": [
 			{
 				"name": "task_id",
