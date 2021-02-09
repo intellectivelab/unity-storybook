@@ -33,7 +33,7 @@ import {
 	withGridViewDomainActions
 } from "@intellective/core";
 
-export default {title: 'Examples/Search/Grid'};
+export default {title: 'Examples/Grid View/Actions'};
 
 const getLinkByRel = (_links, type, name) => _links && (_links[name] || _links[type] || {}).href;
 
@@ -64,45 +64,6 @@ const DefaultGridViewFactory = (props) => {
 	);
 };
 
-/*
-* Using custom grid action
-*/
-export const UsingToolbarAction = () => {
-
-	/**
-	 * Custom action that prints "Hello World" message below the grid
-	 */
-	const withGridViewPrintAction = R.curry((WrappedGrid, props) => {
-		const {id: gridId, defaultActions = []} = props;
-
-		// eslint-disable-next-line react-hooks/rules-of-hooks
-		const [msg, updateMsg] = useState();
-
-		const onRefreshHandler = () => updateMsg("Hello World");
-
-		const _defaultActions = [
-			...defaultActions,
-			<Tooltip title="Print" key={`${gridId}-print-action`} role="tooltip">
-				<IconButton onClick={onRefreshHandler} role="button" aria-label="Refresh">
-					<Print/>
-				</IconButton>
-			</Tooltip>,
-		];
-
-		return (
-			<>
-				<WrappedGrid {...props} defaultActions={_defaultActions}/>
-
-				<Typography variant="h1">{msg}</Typography>
-			</>
-		);
-	});
-
-	return (
-		<DefaultGridViewFactory Component={withGridViewPrintAction(GridView)}/>
-	);
-};
-
 /**
  * Example of form cleanup when component is unmounted
  * Note: it gives error when placed inside UsingToolbarBulkActionWithConfiguredView
@@ -124,7 +85,7 @@ const withFormCleanup = R.curry((WrappedComponent, props) => {
 /*
 * Using custom grid bulk action with default view
 */
-export const UsingBulkActionWithSolutionView = () => {
+export const UsingBulkAction = () => {
 	/**
 	 * Condition to detect Verify action
 	 */
@@ -214,7 +175,7 @@ export const UsingBulkActionWithSolutionView = () => {
 /*
 * Using custom grid bulk action with custom view
 */
-export const UsingBulkActionWithCustomView = () => {
+export const UsingActionViewForm = () => {
 	/**
 	 * Condition to detect Verify action
 	 */
@@ -350,5 +311,44 @@ export const UsingBulkActionWithCustomView = () => {
 		<FactoryContextProvider ActionFactory={ActionFactory}>
 			<DefaultGridViewFactory/>
 		</FactoryContextProvider>
+	);
+};
+
+/*
+* Using custom grid toolbar action
+*/
+export const UsingToolbarAction = () => {
+
+	/**
+	 * Custom action that prints "Hello World" message below the grid
+	 */
+	const withGridViewPrintAction = R.curry((WrappedGrid, props) => {
+		const {id: gridId, defaultActions = []} = props;
+
+		// eslint-disable-next-line react-hooks/rules-of-hooks
+		const [msg, updateMsg] = useState();
+
+		const onRefreshHandler = () => updateMsg("Hello World");
+
+		const _defaultActions = [
+			...defaultActions,
+			<Tooltip title="Print" key={`${gridId}-print-action`} role="tooltip">
+				<IconButton onClick={onRefreshHandler} role="button" aria-label="Refresh">
+					<Print/>
+				</IconButton>
+			</Tooltip>,
+		];
+
+		return (
+			<>
+				<WrappedGrid {...props} defaultActions={_defaultActions}/>
+
+				<Typography variant="h1">{msg}</Typography>
+			</>
+		);
+	});
+
+	return (
+		<DefaultGridViewFactory Component={withGridViewPrintAction(GridView)}/>
 	);
 };

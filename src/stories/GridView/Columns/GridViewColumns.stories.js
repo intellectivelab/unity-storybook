@@ -12,7 +12,7 @@ import {amber, purple} from '@material-ui/core/colors';
 
 import {grids, GridView, useDefaultColumnRenderer, withGridViewConfig, withGridViewDomainActions} from "@intellective/core";
 
-export default {title: 'Examples/Search/Grid'};
+export default {title: 'Examples/Grid View/Columns'};
 
 const DefaultGridViewFactory = (props) => {
 
@@ -22,7 +22,7 @@ const DefaultGridViewFactory = (props) => {
 
 	const _links = {
 		config: {
-			href: "/api/config/components/users"
+			href: "/api/config/components/usersGrid"
 		},
 		query: {
 			href: "/api/users/query",

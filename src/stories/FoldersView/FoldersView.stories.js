@@ -6,9 +6,9 @@ import {useDispatch} from "react-redux";
 
 import {DefaultComponentFactory, FactoryContextProvider, folders, FolderTreeView, withSnackbar, withTreeQueryLoader} from "@intellective/core";
 
-import PageContainer from "../../../components/PageContainer/PageContainer";
+import PageContainer from "../../components/PageContainer/PageContainer";
 
-export default {title: 'Examples/Search/Folders'};
+export default {title: 'Examples/Folders View'};
 
 /**
  * Selects root folder by default
