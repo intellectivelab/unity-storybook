@@ -147,7 +147,7 @@ Let's defined grid configuration.
             "tooltip": "Verify users",
             "type": "custom.verify",
             "href": "/api/users/verify",
-            "resourceName": 'documents',
+            "resourceName": "documents",
             "_links": {
                 "root": {
                     "href": "/api/config/actions",
@@ -198,7 +198,7 @@ For bulk actions it is required that the `href` property is to be defined.
 	"tooltip": "Verify users",
 	"type": "custom.verify",
 	"href": "/api/users/verify",
-	"resourceName": 'documents',
+	"resourceName": "documents",
 	"_links": {
 		"root": {
 			"href": "/api/config/actions",
@@ -338,7 +338,7 @@ For bulk actions it is required that the `href` property is to be defined.
 	"tooltip": "Verify users",
 	"type": "custom.verify",
 	"href": "/api/users/verify",
-	"resourceName": 'documents',
+	"resourceName": "documents",
 	"_links": {
 		"root": {
 			"href": "/api/config/actions",
@@ -561,3 +561,269 @@ const Component = withGridViewPrintAction(GridView);
 ```
 
 <br/>
+
+## Example - Using customized create action
+
+This example shows how to customize one of wizard steps for default `create` action. 
+
+### Steps
+
+We're going to modify `Attach documents` step for `create` action.
+
+Let's define action configuration:
+
+```json
+{
+    "name": "createCase",
+    "label": "Create",
+    "tooltip": "Create new case",
+    "type": "create",
+    "resourceName": "cases",
+    "_links": {
+        "root": {
+            "href": "/api/config/actions",
+            "type": "application/json"
+        },
+        "self": {
+            "href": "/api/config/actions/createCase",
+            "type": "application/json"
+        },
+        "model": {
+            "href": "/api/casetasks",
+            "type": "application/json"
+        },
+        "view": {
+            "href": "/api/config/components/casetasksView2",
+            "type": "application/json"
+        }
+    }
+ }
+```
+
+Let's define casetasksView2 component configuration, that is used as view for `create` action:
+
+```json
+{
+    "id": "DomainCase",
+    "resourceName": "documents",
+    "resourceType": "DomainCase",
+    "viewType": "Create",
+    "tabs": [
+        {
+            "id": "1",
+            "title": "Details",
+            "tooltip": "Case Details",
+            "type": "Details",
+            "fieldSetId": "casetasksViewFieldset2",
+            "_links": {
+                "root": {
+                    "href": "/api/config/components/casetasksView2",
+                    "type": "application/json"
+                },
+                "self": {
+                    "href": "/api/config/components/casetasksView2/tabs/1",
+                    "type": "application/json"
+                },
+                "actions": {
+                    "href": "/api/config/components/casetasksView2/tabs/1/actions",
+                    "type": "application/json"
+                },
+                "fieldset": {
+                    "href": "/api/config/components/casetasksViewFieldset1",
+                    "type": "application/json"
+                }
+            }
+        },
+        {
+            "id": "2",
+            "title": "Documents",
+            "tooltip": "Case Documents",
+            "type": "Attachments",
+            "_links": {
+                "root": {
+                    "href": "/api/config/components/casetasksView2",
+                    "type": "application/json"
+                },
+                "self": {
+                    "href": "/api/config/components/casetasksView2/tabs/2",
+                    "type": "application/json"
+                },
+                "actions": {
+                    "href": "/api/config/components/casetasksView2/tabs/2/actions",
+                    "type": "application/json"
+                },
+                "templates": {
+                    "href": "/api/config/components/usersAttachments2Columns/templates",
+                    "type": "application/json"
+                }
+            }
+        }
+    ]
+}
+```
+
+The component consists of 2 tabs: Details and Attachments. By default only Details tab is taken into consideration when 
+rendering `create` action view. It's displayed on Wizard's 1st step. Two other steps use configuration of Details and 
+Attachments tabs specified for `view` action.
+
+Let's change the default behaviour and use not `view`, but `create` action Attachments tab configuration 
+for Wizard's 3rd step. It allows to have different set of Attachments search templates for case creation and case 
+update.  
+ 
+Let's use following grid configuration for search template of usersAttachments2Columns's template set:
+
+```json
+{
+    "id": "users2ColumnAttachmentsGrid",
+    "title": "New Complaint Users",
+    "ui": "infinite",
+    "columns": [
+        {
+            "name": "id",
+            "label": "Id",
+            "dataType": "string",
+            "width": 100,
+            "multiValue": false,
+            "tooltip": "",
+            "sortable": false,
+            "resizable": false
+        },
+        {
+            "name": "fullName",
+            "label": "Name",
+            "dataType": "string",
+            "width": 200,
+            "tooltip": "",
+            "sortable": true,
+            "resizable": true,
+            "header": "Personal Info"
+        },
+        {
+            "name": "gender",
+            "label": "Gender",
+            "dataType": "string",
+            "width": 100,
+            "tooltip": "",
+            "sortable": true,
+            "resizable": true,
+            "header": "Personal Info"
+        }
+    ],
+    "favorite": ["fullName"],
+    "default": ["fullName", "gender"],
+    "sorting": [
+        {
+            "column": "fullName",
+            "direction": "ASC"
+        }
+    ],
+    "_links": {
+        "self": {
+            "href": "/api/config/components/users2ColumnAttachmentsGrid",
+            "type": "application/json"
+        },
+        "actions": {
+            "href": "/api/config/grids/usersGrid/actions",
+            "type": "application/json"
+        }
+    }
+}
+```
+
+Let's define view for `Attach documents` step:
+
+```jsx 
+const CaseTabTemplates = withResourceViewTabTemplates(SearchTemplate);
+const CustomCreateCaseAttachments = (props) => {
+    const {formId, currentAction = {}, scrollableRef, onError, action} = props;
+
+    const formState = useSelector(R.pathOr({}, ["forms", formId]));
+
+    const {data, objLinks: _links} = formState;
+
+    const payload = parseFormData(data);
+
+    const {status, data: view = {}, error} = useResourceViewLoader(R.path(["_links", "view", "href"], action));
+
+    if (status === "loading") {
+        return (
+            <div style={{marginTop: "24px"}}>
+                <ResourceViewSkeleton/>
+            </div>
+        );
+    }
+
+    if (status === "failed" && error) {
+        onError && onError(error);
+
+        return (
+            <div style={{marginTop: "24px"}}>
+                <ResourceViewSkeleton/>
+            </div>
+        );
+    }
+
+    const tabRenderer = (tab) => <CaseTabTemplates formId={formId} tab={tab} scrollableRef={scrollableRef} onError={onError}/>;
+
+    const {tabs = []} = view;
+
+    const attachmentsTabs = tabs.filter(tab => tab.type === 'Attachments');
+
+    return (
+        <CurrentAction.Provider value={{...currentAction, selected: {...payload, _links}}}>
+            {attachmentsTabs.length > 1
+                ? <TabContainer components={attachmentsTabs} renderer={tabRenderer} scrollableRef={scrollableRef}/>
+                : tabRenderer(attachmentsTabs[0])}
+        </CurrentAction.Provider>
+    );
+};
+```
+
+CustomCaseAttachments is a copy of CaseAttachments with the difference only in link parameter useResourceViewLoader 
+function gets:
+
+```jsx 
+const {status, data: view = {}, error} = useResourceViewLoader(R.path(["_links", "view", "href"], action));
+``` 
+
+It uses action's `view` link.
+
+Lets' create a custom page for Wizard `Attach documents` step:
+
+```jsx
+const CustomCreateCaseAttachmentsPage = {
+    label: 'Attach documents',
+    icon: AttachFileIcon,
+    view: CustomCaseAttachments,
+    actions: [
+        {type: 'back'},
+        {type: 'complete', color: 'secondary', variant: 'contained'},
+    ]
+};
+```
+
+Now we can define custom `create` action, that uses CustomCreateCaseAttachmentsPage component as a page for 3rd step:
+
+```jsx
+const CustomCreateCaseWizardAction = (props) => withActionView({
+    ...props,
+    title: <CreateResourceViewTitle resourceName="Case"/>,
+    refreshOnClose: true,
+    pages: R.map(
+        R.when(R.is(Function), R.call), 
+        [CreateCaseDetailsPage, CreateCasePreviewPage, CustomCreateCaseAttachmentsPage]
+    ),
+    ViewForm: ResourceWizard
+}, () => null);
+```
+
+Let's map our custom action by creating a domain action mapper function.
+
+```jsx
+const DomainActionMapper = R.curry((settings = {}, action) => {
+	return R.cond([
+		[D.isCreateCaseAction, R.always(CustomCreateCaseWizardAction(settings))],
+		[R.T, action => DefaultActionMapper(settings, action)],
+	])(action);
+});
+```

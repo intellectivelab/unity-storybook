@@ -97,7 +97,7 @@ module.exports = {
 			"label": "Create",
 			"tooltip": "Create new case",
 			"type": "create",
-			"resourceName": 'cases',
+			"resourceName": "cases",
 			"_links": {
 				"root": {
 					"href": "/api/config/actions",
@@ -112,7 +112,7 @@ module.exports = {
 					"type": "application/json"
 				},
 				"view": {
-					"href": "/api/config/components/casetasksView1",
+					"href": "/api/config/components/casetasksView2",
 					"type": "application/json"
 				}
 			}

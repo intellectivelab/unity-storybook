@@ -133,6 +133,63 @@ module.exports = {
 			}
 		}
 	},
+	"casetasksView2": {
+		"id": "DomainCase",
+		"resourceName": "documents",
+		"resourceType": "DomainCase",
+		"viewType": "Create",
+		"tabs": [
+			{
+				"id": "1",
+				"title": "Details",
+				"tooltip": "Case Details",
+				"type": "Details",
+				"fieldSetId": "casetasksViewFieldset2",
+				"_links": {
+					"root": {
+						"href": "/api/config/components/casetasksView2",
+						"type": "application/json"
+					},
+					"self": {
+						"href": "/api/config/components/casetasksView2/tabs/1",
+						"type": "application/json"
+					},
+					"actions": {
+						"href": "/api/config/components/casetasksView2/tabs/1/actions",
+						"type": "application/json"
+					},
+					"fieldset": {
+						"href": "/api/config/components/casetasksViewFieldset1",
+						"type": "application/json"
+					}
+				}
+			},
+			{
+				"id": "2",
+				"title": "Documents",
+				"tooltip": "Case Documents",
+				"type": "Attachments",
+				"_links": {
+					"root": {
+						"href": "/api/config/components/casetasksView2",
+						"type": "application/json"
+					},
+					"self": {
+						"href": "/api/config/components/casetasksView2/tabs/2",
+						"type": "application/json"
+					},
+					"actions": {
+						"href": "/api/config/components/casetasksView2/tabs/2/actions",
+						"type": "application/json"
+					},
+					"templates": {
+						"href": "/api/config/components/usersAttachments2Columns/templates",
+						"type": "application/json"
+					}
+				}
+			},
+		]
+	},
 	"casetasksViewFieldset0": {
 		"columns": 1,
 		"fields": [
