@@ -8,8 +8,8 @@
     "build-storybook": "build-storybook -s public"
   },
   "dependencies": {
-    "@intellective/core": "2021.1.0-alpha.25",
-    "@intellective/analytics": "2021.1.0",
+    "@intellective/core": "2021.1.0-alpha.33",
+    "@intellective/analytics": "2021.1.0-alpha.3",
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
@@ -44,7 +44,7 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
+      ">20%",
       "not dead",
       "not op_mini all"
     ],
