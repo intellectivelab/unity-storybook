@@ -1,6 +1,6 @@
 {
   "name": "unity-ui-storybook",
-  "version": "1.0.0",
+  "version": "2021.1.0",
   "private": true,
   "scripts": {
     "server": "node server",
@@ -8,13 +8,13 @@
     "build-storybook": "build-storybook -s public"
   },
   "dependencies": {
-    "@intellective/core": "2021.1.0-alpha.7",
-    "@intellective/analytics": "2021.1.0",
-    "@intellective/unity-api-mocks": "^1.0.9",
-    "@material-ui/core": "^4.11.2",
+    "@intellective/core": "2021.1.0-alpha.33",
+    "@intellective/analytics": "2021.1.0-alpha.3",
+    "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
-    "@material-ui/styles": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
+    "@material-ui/pickers": "^3.2.10",
+    "@material-ui/styles": "^4.11.3",
     "ramda": "^0.27.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.12.10",
+    "@intellective/unity-api-mocks": "1.0.10",
     "@storybook/addon-actions": "^6.1.9",
     "@storybook/addon-docs": "^6.1.9",
     "@storybook/addon-essentials": "^6.1.9",
@@ -43,7 +44,7 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
+      ">20%",
       "not dead",
       "not op_mini all"
     ],

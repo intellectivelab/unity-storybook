@@ -1,0 +1,76 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/FoldersView/README"/>
+
+# Folder Tree View Examples
+
+This page provides various examples of customizing the FolderTreeView component.
+
+<br/>
+
+## Example - Select root folder by default
+
+This example shows how to add a custom behaviour to select Root Folder by default right after TreeView is loaded.
+If the TreeView is a part of SearchTemplate component, then search query will be adjusted as well.
+
+### Steps
+
+Implement High Ordered Component to select root folder by default.
+
+```jsx
+const withSelectedRoot = R.curry((WrappedComponent, props) => {
+
+    //selected and data are the folder tree specific props loaded by FolderTree Component
+    const {id, selected, data, onNodeSelect} = props;
+
+    const isRealEmpty = R.anyPass([R.isEmpty, R.isNil]);
+
+    //filtering root nodes by taking items without parentId
+    const roots = R.filter(R.compose(isRealEmpty, R.prop('parentId')), R.values(data));
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        //force selection only if the folder tree data has been already loaded but nothing is selected yet
+        if(isRealEmpty(selected) && R.not(isRealEmpty(roots))){
+            const nodeIds = R.map(R.prop('id'), roots);
+            const paths = R.map(R.prop('path'), roots);
+            //dispatch root folders ids as selected redux action
+            dispatch(folders.setSelected(id, nodeIds));
+
+            //pass selected event on top level so somewhere in SearchTemplate it will be handled as a query criteria
+            onNodeSelect && onNodeSelect(nodeIds, paths, R.pick(nodeIds, data));
+        }
+
+    }, [selected, roots]);
+
+    return <WrappedComponent {...props} />;
+});
+```
+
+Implement a custom factory component for the FolderTreeView component to compose with withSelectedRoot HOC.
+
+```jsx
+const FolderTreeViewFactory = (props) => {
+
+    const {Component = FolderTreeView, _links = {}, ...otherProps} = props;
+
+    const ComposedFolderTreeView = R.compose(withSnackbar, withTreeQueryLoader, withSelectedRoot)(Component);
+
+    return (
+        <ComposedFolderTreeView {...otherProps} browseLink={_links.browse}/>
+    );
+};
+```
+
+Create mapping conditions for the domain components.
+
+```jsx
+const DomainComponentFactory = R.cond([
+	[R.propEq('type', 'treeView'), FolderTreeViewFactory],
+	[R.T, DefaultComponentFactory]
+]);
+```
+
+
+

@@ -4,14 +4,14 @@ import {DefaultThemeProvider, Palettes} from "@intellective/core";
 
 import {createMuiTheme, responsiveFontSizes} from "@material-ui/core";
 
-import Page from "../../components/Page/Page";
+import PageContainer from "../../components/PageContainer/PageContainer";
 
 export default {title: 'Examples/Theme'};
 
 /*
 * default theme builder with custom palette
 */
-export const UsingPalette = () => {
+export const UsingCustomPalette = () => {
 
 	const customPalette = {
 		palette: {
@@ -32,7 +32,9 @@ export const UsingPalette = () => {
 	};
 
 	return (
-		<Page ThemeProvider={ThemeProvider} href="/api/1.0.0/config/perspectives/search/dashboards/page1"/>
+		<ThemeProvider>
+			<PageContainer href="/api/config/perspectives/storybook/dashboards/page1"/>
+		</ThemeProvider>
 	);
 };
 
@@ -44,7 +46,9 @@ export const UsingDarkPalette = () => {
 	const ThemeProvider = (props) => <DefaultThemeProvider {...props} paletteName="neptune" paletteType="dark"/>;
 
 	return (
-		<Page ThemeProvider={ThemeProvider} href="/api/1.0.0/config/perspectives/search/dashboards/page1"/>
+		<ThemeProvider>
+			<PageContainer href="/api/config/perspectives/storybook/dashboards/page1"/>
+		</ThemeProvider>
 	);
 };
 
@@ -74,16 +78,18 @@ const buildTheme = (options, palette = Palettes.unity.palette) => ({
 	palette,
 });
 
-const CustomThemeBuilder = (options, palette) => responsiveFontSizes(createMuiTheme(buildTheme(options, palette)));
+const DomainThemeBuilder = (options, palette) => responsiveFontSizes(createMuiTheme(buildTheme(options, palette)));
 
 export const UsingThemeBuilder = () => {
 
-	const ThemeProvider = (props) => {
-		return <DefaultThemeProvider {...props} Builder={CustomThemeBuilder}/>;
+	const DomainThemeProvider = (props) => {
+		return <DefaultThemeProvider {...props} Builder={DomainThemeBuilder}/>;
 	};
 
 	return (
-		<Page ThemeProvider={ThemeProvider} href="/api/1.0.0/config/perspectives/search/dashboards/page1"/>
+		<DomainThemeProvider>
+			<PageContainer href="/api/config/perspectives/storybook/dashboards/page1"/>
+		</DomainThemeProvider>
 	);
 };
 

@@ -1,0 +1,60 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Form/Layout/README"/>
+
+# Form Layout Examples
+
+This page shows various ways for customizing the default forms layout component.
+
+<br/>
+
+## Example - Using Custom Form Layout
+
+This example shows how to use a custom form layout component.
+
+### Steps
+
+Implement Custom Layout as a functional component.
+**Note**
+Form view content passed to the component within props.
+
+```jsx
+const CustomFormLayout = (props) => {
+
+	const {children} = props;
+
+	const classes = useStyles();
+
+	const rows = R.splitEvery(4, React.Children.toArray(children));
+
+	return (
+		<div className={classes.root}>
+			<Grid container spacing={4}>
+				{rows.map((row, rowIdx) => (
+					<Grid key={rowIdx}
+					      className={classes.row}
+					      container
+					      item
+					      direction="column"
+					>
+						{row.map((child, idx) => (
+							<Grid item key={`${rowIdx}-${idx}`}>{child}</Grid>
+						))}
+					</Grid>)
+				)}
+			</Grid>
+		</div>
+	);
+};
+```
+
+Override default action factory settings - pass custom settings to the ActionFactory.
+
+```jsx
+const settings = {
+	...,
+	Layout: CustomFormLayout
+};
+
+const DomainActionFactory = new DefaultActionFactory(settings);
+```

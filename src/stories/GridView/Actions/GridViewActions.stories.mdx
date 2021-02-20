@@ -1,0 +1,563 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/GridView/Actions/README"/>
+
+# Grid View Customization Examples
+
+This page shows various ways for customizing the default grid component by defining custom actions.
+
+Let's defined grid configuration.
+
+```json
+{
+    "id": "usersGrid",
+    "title": "Users",
+    "columns": [
+        {
+            "name": "id",
+            "label": "Id",
+            "dataType": "string",
+            "width": 100,
+            "multiValue": false,
+            "tooltip": "",
+            "sortable": false,
+            "resizable": false
+        },
+        {
+            "name": "fullName",
+            "label": "Name",
+            "dataType": "string",
+            "width": 200,
+            "tooltip": "",
+            "sortable": true,
+            "resizable": true,
+            "header": "Personal Info"
+        },
+        {
+            "name": "gender",
+            "label": "Gender",
+            "dataType": "string",
+            "width": 100,
+            "tooltip": "",
+            "sortable": true,
+            "resizable": true,
+            "header": "Personal Info"
+        },
+        {
+            "name": "dob",
+            "label": "Date of Birth",
+            "dataType": "date",
+            "width": 100,
+            "tooltip": "",
+            "sortable": true,
+            "resizable": true
+        },
+        {
+            "name": "age",
+            "label": "Age",
+            "dataType": "int",
+            "width": 50,
+            "tooltip": "",
+            "sortable": true,
+            "resizable": true
+        },
+        {
+            "name": "email",
+            "label": "Email",
+            "dataType": "string",
+            "width": 100,
+            "tooltip": "",
+            "sortable": true,
+            "resizable": true,
+            "header": "Personal Info"
+        },
+        {
+            "name": "phone",
+            "label": "Phone",
+            "dataType": "string",
+            "width": 100,
+            "tooltip": "",
+            "sortable": true,
+            "resizable": true
+        }
+    ],
+    "favorite": ["fullName"],
+    "default": ["fullName", "gender", "dob", "email"],
+    "sorting": [
+        {
+            "column": "gender",
+            "direction": "DESC"
+        }
+    ],
+	"actions": [
+		{
+            "name": "view",
+            "label": "View Details",
+            "tooltip": "View Details",
+            "type": "view",
+            "resourceName": "documents",
+            "_links": {
+                "root": {
+                    "href": "/api/config/actions",
+                    "type": "application/json"
+                },
+                "self": {
+                    "href": "/api/config/actions/view",
+                    "type": "application/json"
+                }
+            }
+        },
+        {
+            "name": "view_content",
+            "label": "View",
+            "tooltip": "View",
+            "type": "view_content",
+            "resourceName": "documents",
+            "_links": {
+                "root": {
+                    "href": "/api/config/actions",
+                    "type": "application/json"
+                },
+                "self": {
+                    "href": "/api/config/actions/view_content",
+                    "type": "application/json"
+                }
+            }
+        },
+        {
+            "name": "download",
+            "label": "Download",
+            "tooltip": "Download",
+            "type": "download",
+            "resourceName": "documents",
+            "_links": {
+                "root": {
+                    "href": "/api/config/actions",
+                    "type": "application/json"
+                },
+                "self": {
+                    "href": "/api/config/actions/download",
+                    "type": "application/json"
+                }
+            }
+        },
+        {
+            "name": "verify",
+            "label": "Verify",
+            "tooltip": "Verify users",
+            "type": "custom.verify",
+            "href": "/api/users/verify",
+            "resourceName": 'documents',
+            "_links": {
+                "root": {
+                    "href": "/api/config/actions",
+                    "type": "application/json"
+                },
+                "self": {
+                    "href": "/api/config/actions/verify",
+                    "type": "application/json"
+                },
+                "view": {
+                    "href": "/api/config/components/UserView",
+                    "type": "application/json"
+                }
+            }
+        }
+	],
+    "_links": {
+        "self": {
+            "href": "/api/config/components/usersGrid",
+            "type": "application/json"
+        },
+        "actions": {
+            "href": "/api/config/grids/usersGrid/actions",
+            "type": "application/json"
+        }
+    }
+}
+```
+
+<br/>
+
+## Example - Using a custom grid bulk action with the solution view form
+
+This example shows how to add custom action with the view configured via the solution file.
+
+### Steps
+
+We're going to add a custom bulk action - `Verify`.
+
+Lets define action configuration.
+
+For bulk actions it is required that the `href` property is to be defined.
+
+```json
+{
+	"name": "verify",
+	"label": "Verify",
+	"tooltip": "Verify users",
+	"type": "custom.verify",
+	"href": "/api/users/verify",
+	"resourceName": 'documents',
+	"_links": {
+		"root": {
+			"href": "/api/config/actions",
+			"type": "application/json"
+		},
+		"self": {
+			"href": "/api/config/actions/verify",
+			"type": "application/json"
+		},
+		"view": {
+			"href": "/api/config/components/UserView",
+			"type": "application/json"
+		}
+	}
+}
+```
+
+Let's define action resource function.
+
+```jsx 
+const isVerifyAction = R.allPass([R.propEq('type', 'custom.verify'), isDocument]);
+``` 
+
+In code snippet above it checks, that action's `resourceName` property equals `documents` and it's `type` is `custom.verify`.
+
+Let's implement a form submit handler for the `Verify` action.
+
+```jsx 
+const VerifyFormSubmitHandler = (props) => {
+	const {actionLink, data, fields = {}, selected} = props;
+
+	const parsedFormData = parseFormData(data, fields);
+
+	const payload = {ids: selected.map(s => s.id), formData: parsedFormData};
+
+	return actionLink && submitRequest(actionLink, payload, 'POST');
+};
+```
+
+This handler will generate a payload with `ids` and `formData` keys, where `ids` is an array, which contains selected records ids, and `formData` is a form data containing object.
+The payload will be sent to the action execution link, i.e. action's href.
+
+Let's map the Verify action handler by creating a domain form submit handlers mapper.
+
+```jsx
+const DomainFormSubmitHandlerMapper = R.cond([
+	[isVerifyAction, R.always(VerifyFormSubmitHandler)],
+	[R.T, DefaultFormSubmitHandlerMapper]
+]);
+```
+
+Let's define a headless(default) handler for the Verify action.
+It will be executed if the `view` link hasn't been defined for some reason.
+
+```jsx
+	const VerifyHeadlessBulkAction = (props) => {
+		const {action, selected, onSuccess, onError} = props;
+
+		useEffect(() => {
+			const ids = Array.isArray(selected) ? selected.map(s => s.id) : [selected.id];
+
+			const payload = {ids, formData: {}};
+
+			action.href && submitRequest(action.href, payload, 'POST').then(onSuccess).catch(onError);
+		}, []);
+
+		return null;
+	};
+```
+
+Similarly to the VerifyFormSubmitHandler it creates a payload with `ids` and `formData` keys. Since for this particular case
+we don't have a view, `formData` object is empty. Payload will be sent to action execution link, i.e. action's href.
+
+Let's create a `Verify` action component.
+
+```jsx
+	const VerifyAction = (props) => withActionView({
+		...props,
+		title: "Verify",
+		submitLabel: "Verify",
+		ViewForm: R.compose(withFormCleanup, withFormSubmitAction)(DefaultViewForm),
+		viewLinkFn: ({_links: actionLinks}, objLinks) => getLinkByRel(objLinks, 'view') || getLinkByRel(actionLinks, 'view'),
+	}, withActionBackdrop(VerifyHeadlessBulkAction));
+```
+
+`withActionView` function uses 2 arguments. The first one contains some action view properties, like `title`,
+`submitLabel`, `ViewForm` (in code snippet above it's a DefaultViewForm, wrapped with 2 functions: withFormCleanup and
+withFormSubmitAction), `viewLinkFn`. Second argument is a handler for case when evaluated by `viewLinkFn` function
+`view` link is empty by some reason.
+
+Example of `withFormCleanup` function, that allows to cleanup form after component is unmounted:
+
+```jsx
+	const {formId} = props;
+	const dispatch = useDispatch();
+	const cleanup = () => dispatch(clearFormState(formId));
+
+	useEffect(() => {
+		return cleanup;
+	}, []);
+
+	return <WrappedComponent {...props}/>;
+```
+
+As an option you may redeclare `onSuccess` and `onClose` functions inside `withFormCleanup` function
+(instead of `useEffect` hook), so that form isn't cleared when server returns error.
+
+Let's map the Verify action by creating a domain action mapper function.
+
+```jsx
+const DomainActionMapper = R.curry((settings = {}, action) => {
+	return R.cond([
+		[isVerifyAction, R.always(VerifyAction(settings))],
+		[R.T, action => DefaultActionMapper(settings, action)],
+	])(action);
+});
+```
+
+<br/>
+
+## Example - Using a custom grid bulk action with a custom view form
+
+This example shows how to add a custom action with the custom view configuration.
+
+### Steps
+
+We're going to add a custom bulk action - `Verify`.
+
+Lets define action configuration.
+
+For bulk actions it is required that the `href` property is to be defined.
+
+```json
+{
+	"name": "verify",
+	"label": "Verify",
+	"tooltip": "Verify users",
+	"type": "custom.verify",
+	"href": "/api/users/verify",
+	"resourceName": 'documents',
+	"_links": {
+		"root": {
+			"href": "/api/config/actions",
+			"type": "application/json"
+		},
+		"self": {
+			"href": "/api/config/actions/verify",
+			"type": "application/json"
+		},
+		"view": {
+			"href": "/api/config/components/UserView",
+			"type": "application/json"
+		}
+	}
+}
+```
+
+Let's define action resource function.
+
+```jsx
+const isVerifyAction = R.allPass([R.propEq('type', 'custom.verify'), isDocument]);
+```
+
+In code snippet above it checks, that action's `resourceName` property equals `documents` and it's `type` is `custom.verify`.
+
+Let's implement a form submit handler for the `Verify` action.
+
+```jsx 
+const VerifyFormSubmitHandler = (props) => {
+	const {actionLink, data, fields = {}, selected} = props;
+
+	const formData = parseFormData(data, fields);
+
+	const payload = {ids: selected.map(s => s.id), formData};
+
+	return actionLink && submitRequest(actionLink, payload, 'POST');
+};
+```
+This handler will generate a payload with `ids` and `formData` keys, where `ids` is an array, which contains selected records ids, and `formData` is a form data containing object.
+The payload will be sent to the action execution link, i.e. action's href.
+
+Let's map the Verify action handler by creating a domain form submit handlers mapper.
+
+```jsx
+const DomainFormSubmitHandlerMapper = R.cond([
+	[isVerifyAction, R.always(VerifyFormSubmitHandler)],
+	[R.T, DefaultFormSubmitHandlerMapper]
+]);
+```
+
+Let's define a headless(default) handler for the Verify action.
+It will be executed if the `view` link hasn't been defined for some reason.
+
+```jsx
+	const VerifyHeadlessBulkAction = (props) => {
+		const {action, selected, onSuccess, onError} = props;
+
+		useEffect(() => {
+			const ids = Array.isArray(selected) ? selected.map(s => s.id) : [selected.id];
+
+			const payload = {ids, formData: {}};
+
+			action.href && submitRequest(action.href, payload, 'POST').then(onSuccess).catch(onError);
+		}, []);
+
+		return null;
+	};
+```
+
+Similarly to the VerifyFormSubmitHandler it creates a payload with `ids` and `formData` keys. Since for this particular case
+we don't have a view, `formData` object is empty. Payload will be sent to action execution link, i.e. action's href.
+
+Let's create a custom view form component for the action.
+
+```jsx
+const VerifyViewForm = (props) => {
+	const {classes, formId, actions, loading, FieldComponent = FormField} = props;
+
+	const dispatch = useDispatch();
+	const formData = useSelector(R.path(["forms", formId, 'data']));
+
+	useEffect(() => {
+		const data = {age: {type: 'range', name: 'range', label: 'Age', value: [18, 60]}};
+		dispatch(updateFormState(formId, {data, objLinks: {}}));
+	}, []);
+
+	return (<>
+		<div className={classes.root}>
+
+			{actions && actions.length > 0 &&
+			  <Toolbar role="toolbar">
+				{loading && <div style={{width: '100%'}}><LinearProgress color="primary"/></div>}
+				{!loading && <div style={{flex: '1 1'}}/>}
+				{!loading && actions}
+			</Toolbar>}
+
+			<div className={classes.content}>
+				<Typography display='block' variant="subtitle2" color='textPrimary'>
+					Specified age range: {`${R.path(['age', 'value', 0], formData)} - ${R.path(['age', 'value', 1], formData)}`} <sup>1</sup>
+				</Typography>
+				<form id={formId} noValidate role="form" aria-label="Details View">
+					<FieldComponent {...R.prop('age', formData)} formatValue={x => `${x} years`}
+									data={[{value: 0}, {value: 18}, {value: 25}, {value: 35}, {value: 45}, {value: 60}, {value: 99}]}
+									formatValue={x => `${x} years`}
+									onChange={(value) => dispatch(updateFieldValue(formId, 'age', value))}/>
+				</form>
+				<Typography display='block' variant="body2" color='textSecondary' mt={3}>
+					<p><sup>1</sup>A business must identify and understand its target audience if their marketing campaign is
+						to be successful. It allows the business to craft their products or services to the wants
+						and needs of customers, in order to maximise sales and therefore revenue.
+						A successful marketing campaign connects with consumers on a personal dB level, which will
+						help the business to develop long-term relationships with customers (Sherlock, 2014).
+					</p>
+
+					<p>Not all consumers are the same. Determining the target audience is key to reaching the loyal
+						and high-profit customers, in order to ensure a return on investment (Cahill, 1997, p. 10-11).
+					</p>
+
+					<p>To determine the target audience, the business must first identify what problem their
+						product or service solves, or what need or want it fulfills (Sherlock, 2014).
+						The problem must be one that consumers are aware of and thus will be interested in solving.
+					</p>
+				</Typography>
+			</div>
+		</div>
+	</>)
+};
+```
+
+The form contains submit button, slider component to specify age range for the action and some text.
+The form is initialized with following value for slider field - [18, 60] and uses `forms` store to keep and
+retrieve `age` field values.
+
+Let's create a custom `Verify` action component.
+
+```jsx
+	const VerifyAction = (props) => withActionView({
+		...props,
+		title: "Verify",
+		submitLabel: "Verify",
+		ViewForm: R.compose(withFormSubmitAction, withStyles(styles))(VerifyViewForm),
+	}, () => null);
+```
+
+`withActionView` function uses 2 arguments.
+
+First argument contains action view properties, like `title`, `submitLabel` and `ViewForm`. `ViewForm` uses defined
+above `VerifyViewForm` with 2 HOCs. Wrapping view with `withFormSubmitAction` function adds some extra logic
+for submit button. `withStyles` HOC allows to add some extra styling; example for `styles` attribute is in the
+snippet below:
+
+```jsx
+	const styles = (theme) => ({
+		root: {
+			width: '100%',
+		},
+		content: {
+			marginTop: theme.spacing(2)
+		},
+	});
+```
+
+The second argument of `withActionView` is just a function which returns `null`: there is no need to specify a
+headless handler since no way we haven't view for the action.
+
+Let's map the action by creating a domain action mapper function.
+
+```jsx
+const DomainActionMapper = R.curry((settings = {}, action) => {
+	return R.cond([
+		[isVerifyAction, R.always(VerifyAction(settings))],
+		[R.T, action => DefaultActionMapper(settings, action)],
+	])(action);
+});
+```
+
+<br/>
+
+## Example - Using a custom grid toolbar action
+
+This example shows how to add a custom action component that will be rendered in the grid toolbar.
+
+### Steps
+
+Implement custom component that prints "Hello World" underneath the grid.
+
+```jsx
+const withGridViewPrintAction = R.curry((WrappedGrid, props) => {
+    const {id: gridId, defaultActions = []} = props;
+
+    const [msg, updateMsg] = useState();
+
+    const onRefreshHandler = () => updateMsg("Hello World");
+
+    const _defaultActions = [
+        ...defaultActions,
+        <Tooltip title="Print" key={`${gridId}-print-action`} role="tooltip">
+            <IconButton onClick={onRefreshHandler} role="button" aria-label="Refresh">
+                <Print/>
+            </IconButton>
+        </Tooltip>,
+    ];
+
+    return (
+        <>
+            <WrappedGrid {...props} defaultActions={_defaultActions}/>
+
+            <Typography variant="h1">{msg}</Typography>
+        </>
+    );
+});
+```
+
+Extend the default GridView component with withGridViewPrintAction high-order function and pass it to the GridView factory component.
+
+```jsx
+const Component = withGridViewPrintAction(GridView);
+
+<DefaultGridViewFactory Component={Component}/>
+```
+
+<br/>
