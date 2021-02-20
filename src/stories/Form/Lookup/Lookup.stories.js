@@ -4,7 +4,7 @@ import * as R from "ramda";
 
 import {useDispatch} from "react-redux";
 
-import {DefaultFormFieldRenderer, forms, LookupField, withFormLookupContext, withLookupConfigLoader} from "@intellective/core";
+import {DefaultFormFieldRenderer, forms, LookupField, withFormCriteriaContext, withLookupConfigLoader} from "@intellective/core";
 
 export default {title: 'Examples/Form/Lookup'};
 
@@ -44,7 +44,7 @@ const withSelectionHandler = R.curry((WrappedField, props) => {
 });
 
 export const UsingLookupSelection = () => {
-	const DomainLookupField = R.compose(withLookupConfigLoader, withFormLookupContext, withSelectionHandler)(LookupField);
+	const DomainLookupField = R.compose(withLookupConfigLoader, withFormCriteriaContext, withSelectionHandler)(LookupField);
 
 	const formId = "default";
 
