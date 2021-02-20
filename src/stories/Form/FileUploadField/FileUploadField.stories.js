@@ -40,7 +40,7 @@ export const UsingDropzone = () => {
 	]);
 
 	return (
-		<CustomFileUploadField id="customFileUpload"/>
+		<CustomFileUploadField id="customFileUpload" label="Attachment" variant="dropzone"/>
 	);
 }
 
