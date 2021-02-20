@@ -1,0 +1,70 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Components/View Form/Fields/Lookup/README"/>
+
+# Lookup Usage Example
+
+This page provides various examples of using and customizing the Lookup component.
+
+<br/>
+
+## Example - Custom Selection
+
+This example shows how to a use a context of the selected entity to be able to fill out other form fields when needed.
+In this example we are going to compose address related values of selected Assign To User field and assign it to Assignee Address.
+
+### Steps
+
+Implement a function that takes a context of the selected entity from the lookup field and populate other field
+by composing some values from the context and dispatching it within updateFieldValue redux form action.
+
+```jsx
+const onLookupSelectHandler = R.curry ((formId, fieldId, dispatch, value) => {
+    const nameMapper = value => {
+        const nameExtractor = value => value && value.name || value && value.value || value;
+        return value && Array.isArray(value) ? value.map(v => nameExtractor(v)) : nameExtractor(value);
+    };
+
+    const address = R.compose(
+        R.join(','),
+        R.map(nameMapper),
+        R.values,
+        R.pick(['country', 'state', 'city', 'zipCode'])
+    )(value || {});
+
+    dispatch(forms.updateFieldValue(formId, fieldId, address));
+});
+```
+
+Create an extension (HOC) for the Lookup Field component to handle its onSelect event by onLookupSelectHandler.
+
+```jsx
+const withSelectionHandler = R.curry((formId, fieldId, WrappedField, props) => {
+	const dispatch = useDispatch();
+
+	return <WrappedField {...props} onSelect={onLookupSelectHandler(formId, fieldId, dispatch)}/>;
+});
+```
+
+Implement a Factory to build a custom Lookup Form Field.
+
+```jsx
+const UsersLookupFieldFactory = (props) => {
+	const {formId} = props;
+	const linkedFieldId = "assignee_address";
+	return R.compose(withSelectionHandler(formId, linkedFieldId))(LookupField);
+};
+```
+
+Create mapping conditions for the domain form fields.
+```jsx
+const DomainFieldMapper = R.cond([
+	[R.propEq('lookupId', 'usersLookup'), UsersLookupFieldFactory],
+]);
+```
+
+Implement the domain form field factory in the way that the domain form fields mapping comes first.
+
+```jsx
+const DomainFormFieldFactory = (props) => DomainFieldMapper(props) || DefaultFormFieldFactory(props)
+```

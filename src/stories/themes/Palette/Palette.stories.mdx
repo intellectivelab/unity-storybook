@@ -1,0 +1,54 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Themes/Palette/README"/>
+
+# Theme and Palettes Usage Example
+
+This page provides various examples of using and customizing the UI theme and palettes.
+
+<br/>
+
+## Example - Default theme builder with core Neptune palette
+
+This example shows how to change palette from default Unity to Neptune.
+
+### Steps
+
+Implement a custom ThemeProvider component that wraps DefaultThemeProvider and sets paletteName/paletteType parameters.
+
+```jsx
+const DomainThemeProvider = (props) => <DefaultThemeProvider {...props} paletteName="neptune" paletteType="dark"/>;
+```
+
+<br/>
+
+## Example - Default theme builder with custom palette
+
+This example shows how to create and use a custom palette.
+
+### Steps
+
+Create the custom palette object.
+
+```jsx
+const customPalette = {
+    displayName: "blue-grey/orange",
+    palette: {
+        type: "light",
+        primary: {
+            main: "#607D8B",
+            contrastText: "#FFFFFF",
+        },
+        secondary: {
+            main: "#FF9800",
+            contrastText: '#212121'
+        },
+    }
+};
+```
+
+Implement a custom ThemeProvider component that wraps DefaultThemeProvider and adds customPalette to the Palettes list. Also the custom palette name is passed as paletteName prop.
+
+```jsx
+const DomainThemeProvider = (props) => <DefaultThemeProvider {...props} paletteName="customPalette" Palettes={{...Palettes, customPalette}}/>;
+```
