@@ -31,7 +31,7 @@ import {
 
 export default {title: 'Examples/Actions/Create Case'};
 
-const CasesGridViewFactory = (props) => {
+const GridViewFactory = (props) => {
 
 	const {Component = GridView, ...otherProps} = props;
 
@@ -54,16 +54,25 @@ const CasesGridViewFactory = (props) => {
 	);
 };
 
+const defaultSettings = {
+	variant: 'dialog',
+	fullScreen: true,
+	maxWidth: 'xl',
+	innerMaxWidth: 'lg',
+	margin: 'dense',
+	Layout: TwoColumnsLayout
+};
+
 /*
 * Using customized create action
 */
-export const UsingCustomWizardPage = () => {
+export const UsingCustomWizardStep = () => {
 	/**
-	 * Customized view for Attach documents step
+	 * Customized View for Attachments step
 	 */
-	const CaseTabTemplates = withResourceViewTabTemplates(SearchTemplate);
+	const CaseAttachmentsTemplates = withResourceViewTabTemplates(SearchTemplate);
 
-	const CustomCaseAttachments = (props) => {
+	const CaseAttachmentsView = (props) => {
 		const {formId, currentAction = {}, scrollableRef, onError, action} = props;
 
 		const formState = useSelector(R.pathOr({}, ["forms", formId]));
@@ -92,7 +101,7 @@ export const UsingCustomWizardPage = () => {
 			);
 		}
 
-		const tabRenderer = (tab) => <CaseTabTemplates formId={formId} tab={tab} scrollableRef={scrollableRef} onError={onError}/>;
+		const tabRenderer = (tab) => <CaseAttachmentsTemplates formId={formId} tab={tab} scrollableRef={scrollableRef} onError={onError}/>;
 
 		const {tabs = []} = view;
 
@@ -110,10 +119,10 @@ export const UsingCustomWizardPage = () => {
 	/**
 	 * Customized page for Attach documents step
 	 */
-	const CustomCreateCaseAttachmentsPage = {
-		label: 'Attach documents',
+	const CreateCaseAttachmentsPage = {
+		label: 'Attachments',
 		icon: AttachFileIcon,
-		view: CustomCaseAttachments,
+		view: CaseAttachmentsView,
 		actions: [
 			{type: 'back'},
 			{type: 'complete', color: 'secondary', variant: 'contained'},
@@ -124,16 +133,13 @@ export const UsingCustomWizardPage = () => {
 	 * Custom create case action with 3 steps:
 	 * - CreateCaseDetailsPage (default behavior)
 	 * - CreateCasePreviewPage (default behavior)
-	 * - CustomCreateCaseAttachmentsPage (customized step)
+	 * - CreateCaseAttachmentsPage (custom view)
 	 */
-	const CustomCreateCaseWizardAction = (props) => withActionView({
+	const DomainCreateCaseAction = (props) => withActionView({
 		...props,
 		title: <CreateResourceViewTitle resourceName="Case"/>,
 		refreshOnClose: true,
-		pages: R.map(
-			R.when(R.is(Function), R.call),
-			[CreateCaseDetailsPage, CreateCasePreviewPage, CustomCreateCaseAttachmentsPage]
-		),
+		pages: R.map(R.when(R.is(Function), R.call), [CreateCaseDetailsPage, CreateCasePreviewPage, CreateCaseAttachmentsPage]),
 		ViewForm: ResourceWizard
 	}, () => null);
 
@@ -142,28 +148,19 @@ export const UsingCustomWizardPage = () => {
 	 */
 	const DomainActionMapper = R.curry((settings = {}, action) => {
 		return R.cond([
-			[D.isCreateCaseAction, R.always(CustomCreateCaseWizardAction(settings))],
+			[D.isCreateCaseAction, R.always(DomainCreateCaseAction(settings))],
 			[R.T, action => DefaultActionMapper(settings, action)],
 		])(action);
 	});
 
-	const settings = {
-		variant: 'dialog',
-		fullScreen: true,
-		maxWidth: 'xl',
-		innerMaxWidth: 'lg',
-		margin: 'dense',
-		Layout: TwoColumnsLayout
-	};
-
 	/**
 	 * Action factory component with redefined ActionMapper
 	 */
-	const ActionFactory = new DefaultActionFactory(settings, DomainActionMapper);
+	const ActionFactory = new DefaultActionFactory(defaultSettings, DomainActionMapper);
 
 	return (
 		<FactoryContextProvider ActionFactory={ActionFactory}>
-			<CasesGridViewFactory/>
+			<GridViewFactory/>
 		</FactoryContextProvider>
 	);
 };
