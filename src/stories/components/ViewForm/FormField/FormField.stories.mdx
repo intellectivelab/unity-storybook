@@ -1,0 +1,176 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Components/View Form/Fields/FormField/README"/>
+
+# Form Field Usage Example
+
+This page shows various ways for customizing default form fields.
+
+<br/>
+
+## Example - Using a custom field adornment
+
+This example shows how to add a custom URL form field adornment that opens url in a new browser tab.
+
+### Steps
+
+Create an extension (HOC) for the URL Field component that adds custom field adornment.
+Adornment can be added both to the beginning (`startAdornment`) and to the end (`endAdornment`) of the form field.
+
+```jsx
+const withOpenBrowserTabAdornment = R.curry((WrappedField, props) => {
+
+	const {InputProps = {}, value} = props;
+
+	const onClickHandler = () => {
+		window.open(value, "_blank");
+	};
+
+	const endAdornment = (
+		<InputAdornment position="end">
+			<Tooltip title="Open in a new browser tab" role="tooltip">
+				<IconButton size="small"
+				            role="button"
+				            aria-label="Open"
+				            onClick={onClickHandler}>
+					<OpenInNewIcon/>
+				</IconButton>
+			</Tooltip>
+		</InputAdornment>
+	);
+
+	return <WrappedField {...props} InputProps={{...InputProps, endAdornment}}/>;
+});
+```
+
+Create a custom form field with the URL adornment and map it to the configuration attribute.
+
+```jsx
+
+const CustomUrlField = withOpenBrowserTabAdornment(UrlField);
+
+const DomainFormFieldFactory = R.cond([
+	[R.propEq("ui", "custom_url"), R.always(CustomUrlField)],
+	[R.T, DefaultFormFieldFactory]
+]);
+```
+
+
+## Example - Using a custom form field component
+
+This example shows how to add a custom form field based on [Material UI Rating component](https://material-ui.com/components/rating/)
+
+### Steps
+
+Implement custom component that shows rating for a given numeric value. The properties below are used by the component:
+
+| prop | Description |
+|:----|:-------------------|
+| id        |  Comes from field configuration, used as rating component name |
+| label     |  Comes from field configuration, used to render FormLabel |
+| value     |  Initially comes from configuration as default value, then after any field change new value will be passed via props |
+| onChange  |  Typically onChange is a handler responsible for updating the field value in form redux state |
+
+
+```jsx
+const RatingField = props => {
+
+    const {id, label, margin = "dense", value, onChange} = props;
+
+    const handleChange = (event, newValue) => {
+        onChange && onChange(newValue);
+    };
+
+    return (
+        <FormControl margin={margin} fullWidth component="div">
+            <FormLabel component="label">{label}</FormLabel>
+
+            <Rating name={id} value={value} onChange={handleChange}/>
+        </FormControl>
+    );
+};
+```
+Create a custom form field with the URL adornment and map it to the configuration attribute.
+
+```jsx
+const DomainFormFieldFactory = R.cond([
+	[R.propEq("ui", "rating"), R.always(RatingField)],
+	[R.T, DefaultFormFieldFactory]
+]);
+```
+
+## Example - Custom a custom input mask
+
+This example shows how to add a custom form field formatter for the following use-case:
+User enters the phone number as 1234567898. This needs to be formatted to 123-456-7898.
+
+### Steps
+
+This example uses third-party library [react-text-mask](https://github.com/text-mask/text-mask) to format an input.
+Pls note that this library is not currently maintained, so you should probably consider using alternative options.
+
+Add the library as a dependency, for example with yarn:
+```jsx
+yarn add react-text-mask
+```
+
+Implement a custom React MaskedInput component with needed configuration and handles the inputRef property.
+
+```jsx
+const CustomTextMask = props => {
+	const {inputRef, mask, guide = false, showMask = true, ...otherProps} = props;
+
+	return (
+		<MaskedInput {...otherProps}
+		             ref={(ref) => {
+			             inputRef(ref ? ref.inputElement : null);
+		             }}
+		             mask={mask}
+		             guide={guide}
+		             showMask={showMask}
+		/>
+	);
+};
+```
+
+Create a high-order component (HOC) for the AutocompleteField that adds a custom input component.
+
+```jsx
+const withMaskedInput = R.curry((WrappedField, props) => {
+
+	const {InputProps = {}, inputProps = {}, onChange} = props;
+
+	const handleChange = (value) => {
+		onChange && onChange(R.replace(/\D+/g, '', R.defaultTo('', value)));
+	};
+
+	const {mask} = props;
+
+	return (
+		<WrappedField {...props}
+		              inputProps={{...inputProps, mask}}
+		              InputProps={{...InputProps, inputComponent: TextMaskCustom}}
+		              onChange={handleChange}
+		/>
+	);
+});
+```
+
+Create a custom phone field component and map it to the configuration attribute.
+
+```jsx
+const PhoneField = withMaskedInput(AutocompleteField);
+
+const DomainFormFieldFactory = R.cond([
+	[R.propEq("ui", "phone"), R.always(PhoneField)],
+	[R.T, DefaultFormFieldFactory]
+]);
+```
+
+Using the PhoneField.
+
+```jsx
+const phoneMask = [/\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+
+<PhoneField mask={phoneMask} value="123456789"/>
+```

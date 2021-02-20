@@ -11,7 +11,7 @@ addParameters({
 	options: {
 		theme: {
 			...themes.light,
-			brandTitle: `Unity React Storybook v${PackageInfo.version}`
+			brandTitle: `Unity Storybook v${PackageInfo.version}`
 		},
 	},
 });

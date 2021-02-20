@@ -1,0 +1,54 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Components/View Form/Fields/FileUpload/README"/>
+
+# File Upload Field Usage Example
+
+This page provides various examples of using and customizing the FileUploadField component.
+
+<br/>
+
+## Example - Using custom dropzone message
+
+This example shows how to replace default dropzone message with a custom one.
+
+### Steps
+
+Implement a wrapper for a FileUploadField and pass property 'dropZoneMessage'. You may also replace a message that shows when dragging is active
+
+```jsx
+const CustomFileUploadField = (props) => {
+	return (
+		<FileUploadField {...props}
+		                 dropZoneMessage={`Custom message for '${props.label}' field`}
+		                 dropZoneDragActiveMessage="Drop these PDFs here"
+		/>
+	);
+};
+```
+
+Create a mapping condition for the custom form field.
+```jsx
+const isFileUploadField = R.anyPass([
+	R.allPass([
+		R.propEq("type", "string"),
+		R.anyPass([
+			R.propEq("ui", "filedroparea"),
+			R.propEq("ui", "filedropzone")
+		])
+	]),
+	R.allPass([
+		R.propEq("type", "file"),
+		R.anyPass([
+			R.propEq("variant", "droparea")
+		])
+	]),
+	R.propEq('type', 'filedroparea'),
+	R.propEq('type', 'filedropzone'),
+]);
+
+const DomainFormFieldFactory = R.cond([
+	[isFileUploadField, R.always(CustomFileUploadField)],
+	[R.T, DefaultFormFieldFactory]
+]);
+```
