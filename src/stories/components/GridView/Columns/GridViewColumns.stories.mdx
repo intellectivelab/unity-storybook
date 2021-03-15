@@ -216,19 +216,19 @@ const withCustomCellHandler = R.curry((WrappedGrid, props) => {
 
 	const action = findAction('view')(actions);
 
-	const useCustomCellRenderer = R.curry((classes, row, column) => {
+	const useCustomCellRenderer = R.curry((column, props) => {
 
-		const value = row[column.name];
+		const {value, data} = props;
+
+		const CellRenderer = useMemo(() => {
+			const defaultColumnRenderer = useDefaultColumnRenderer(column);
+			return column.renderer || defaultColumnRenderer;
+		}, [column]);
 
 		return (
-			<TableCell key={`${row.id}-${column.name}`}
-			           className={classes.tableCell}
-			           scope="row"
-			           variant="body"
-			           onDoubleClick={() => dispatch(grids.updateGridCurrentAction(id, {action, selected: row}))}
-			>
-				{column.renderer ? column.renderer(value, row, column) : value}
-			</TableCell>
+			<span onDoubleClick={() => dispatch(grids.updateGridCurrentAction(id, {action, selected: data}))}>
+				<CellRenderer column={column} data={data} value={value}/>
+			</span>
 		);
 	});
 

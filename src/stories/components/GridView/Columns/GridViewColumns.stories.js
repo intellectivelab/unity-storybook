@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 
 import {useDispatch} from "react-redux";
 
@@ -10,7 +10,14 @@ import PageviewIcon from '@material-ui/icons/Pageview';
 
 import {amber, purple} from '@material-ui/core/colors';
 
-import {grids, GridView, useDefaultColumnRenderer, withGridViewConfig, withGridViewDomainActions} from "@intellective/core";
+import {
+	FactoryContextProvider,
+	grids,
+	GridView,
+	useDefaultColumnRenderer,
+	withGridViewConfig,
+	withGridViewDomainActions
+} from "@intellective/core";
 
 export default {title: 'Examples/Components/GridView/Columns'};
 
@@ -70,7 +77,9 @@ export const UsingColumnAction = () => {
 	]);
 
 	return (
-		<DefaultGridViewFactory useColumnRenderer={useColumnRenderer}/>
+		<FactoryContextProvider>
+			<DefaultGridViewFactory useColumnRenderer={useColumnRenderer}/>
+		</FactoryContextProvider>
 	);
 };
 
@@ -108,7 +117,9 @@ export const UsingColumnRenderer = () => {
 	]);
 
 	return (
-		<DefaultGridViewFactory useColumnRenderer={useDomainColumnRenderer}/>
+		<FactoryContextProvider>
+			<DefaultGridViewFactory useColumnRenderer={useDomainColumnRenderer}/>
+		</FactoryContextProvider>
 	);
 };
 
@@ -124,19 +135,20 @@ const withCustomCellHandler = R.curry((WrappedGrid, props) => {
 
 	const action = findAction('view')(actions);
 
-	const useCustomCellRenderer = R.curry((classes, row, column) => {
 
-		const value = row[column.name];
+	const useCustomCellRenderer = R.curry((column, props) => {
+
+		const {value, data} = props;
+
+		const CellRenderer = useMemo(() => {
+			const defaultColumnRenderer = useDefaultColumnRenderer(column);
+			return column.renderer || defaultColumnRenderer;
+		}, [column]);
 
 		return (
-			<TableCell key={`${row.id}-${column.name}`}
-			           className={classes.tableCell}
-			           scope="row"
-			           variant="body"
-			           onDoubleClick={() => dispatch(grids.updateGridCurrentAction(id, {action, selected: row}))}
-			>
-				{column.renderer ? column.renderer(value, row, column) : value}
-			</TableCell>
+			<span onDoubleClick={() => dispatch(grids.updateGridCurrentAction(id, {action, selected: data}))}>
+				<CellRenderer column={column} data={data} value={value}/>
+			</span>
 		);
 	});
 
@@ -153,6 +165,8 @@ export const UsingColumnDoubleClick = () => {
 	const DomainGridView = withCustomCellHandler(GridView);
 
 	return (
-		<DefaultGridViewFactory Component={DomainGridView}/>
+		<FactoryContextProvider>
+			<DefaultGridViewFactory Component={DomainGridView}/>
+		</FactoryContextProvider>
 	);
 };

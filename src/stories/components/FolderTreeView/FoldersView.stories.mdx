@@ -36,7 +36,7 @@ const withSelectedRoot = R.curry((WrappedComponent, props) => {
             const nodeIds = R.map(R.prop('id'), roots);
             const paths = R.map(R.prop('path'), roots);
             //dispatch root folders ids as selected redux action
-            dispatch(folders.setSelected(id, nodeIds));
+            dispatch(folders.updateSelected(id, nodeIds));
 
             //pass selected event on top level so somewhere in SearchTemplate it will be handled as a query criteria
             onNodeSelect && onNodeSelect(nodeIds, paths, R.pick(nodeIds, data));
