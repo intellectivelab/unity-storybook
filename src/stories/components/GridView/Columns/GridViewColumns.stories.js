@@ -4,7 +4,7 @@ import {useDispatch} from "react-redux";
 
 import * as R from "ramda";
 
-import {Avatar, Box, TableCell, Typography} from "@material-ui/core";
+import {Avatar, Box, Typography} from "@material-ui/core";
 
 import PageviewIcon from '@material-ui/icons/Pageview';
 
@@ -42,11 +42,13 @@ const DefaultGridViewFactory = (props) => {
 */
 export const UsingColumnAction = () => {
 
-	const useCustomActionRenderer = (column) => (value, row) => {
+	const CustomActionRenderer = (props) => {
+		const {column, value, data} = props;
+
 		const handleClick = (event) => {
 			event.preventDefault();
 
-			alert("Gender Lookup");
+			alert(value);
 		};
 
 		return (
@@ -65,7 +67,7 @@ export const UsingColumnAction = () => {
 
 	// eslint-disable-next-line react-hooks/rules-of-hooks
 	const useColumnRenderer = R.cond([
-		[R.propEq('name', 'gender'), useCustomActionRenderer],
+		[R.propEq('name', 'gender'), R.always(CustomActionRenderer)],
 		[R.T, useDefaultColumnRenderer]
 	]);
 
@@ -79,13 +81,9 @@ export const UsingColumnAction = () => {
 */
 export const UsingColumnRenderer = () => {
 
-	const mapValue = R.cond([
-		[R.is(Array), R.map(R.when(R.is(Object), R.prop('value')))],
-		[R.is(Object), R.prop('value')],
-		[R.T, R.identity]
-	]);
+	const GenderColumnRenderer = props => {
+		const {value} = props;
 
-	const renderGender = R.curry((column, value) => {
 		if (R.isEmpty(value) || R.isNil(value)) {
 			return null;
 		}
@@ -96,14 +94,12 @@ export const UsingColumnRenderer = () => {
 		])(value);
 
 		return <Avatar style={{color}}>{value.charAt(0)}</Avatar>;
-	});
-
-	const useGenderColumnRenderer = (column) => (value, row) => R.compose(renderGender(column), mapValue)(value);
+	}
 
 	const isGenderColumn = R.anyPass([R.propEq('name', 'gender')]);
 
 	const useDomainColumnRenderer = R.cond([
-		[isGenderColumn, useGenderColumnRenderer],
+		[isGenderColumn, R.always(GenderColumnRenderer)],
 		[R.T, useDefaultColumnRenderer]
 	]);
 
@@ -115,33 +111,23 @@ export const UsingColumnRenderer = () => {
 /**
  *  Adds a custom action that implements cellRenderer with onDoubleClick handler
  */
-const withCustomCellHandler = R.curry((WrappedGrid, props) => {
-	const findAction = actionName => R.find(R.propEq("name", actionName));
+const withDoubleClickHandler = R.curry((WrappedComponent, props) => {
+	const {data} = props;
 
-	const {id, actions} = props;
+	const action = {type: "view"};
 
 	const dispatch = useDispatch();
 
-	const action = findAction('view')(actions);
+	const onDoubleClickHandler = (e) => {
+		e.preventDefault();
 
-	const useCustomCellRenderer = R.curry((classes, row, column) => {
-
-		const value = row[column.name];
-
-		return (
-			<TableCell key={`${row.id}-${column.name}`}
-			           className={classes.tableCell}
-			           scope="row"
-			           variant="body"
-			           onDoubleClick={() => dispatch(grids.updateGridCurrentAction(id, {action, selected: row}))}
-			>
-				{column.renderer ? column.renderer(value, row, column) : value}
-			</TableCell>
-		);
-	});
+		dispatch(grids.updateGridCurrentAction("usersGrid", {action, selected: data}));
+	};
 
 	return (
-		<WrappedGrid {...props} useCellRenderer={useCustomCellRenderer}/>
+		<span onDoubleClick={onDoubleClickHandler}>
+			<WrappedComponent {...props}/>
+		</span>
 	);
 });
 
@@ -150,9 +136,9 @@ const withCustomCellHandler = R.curry((WrappedGrid, props) => {
 */
 export const UsingColumnDoubleClick = () => {
 
-	const DomainGridView = withCustomCellHandler(GridView);
+	const useDomainColumnRenderer = (props) => withDoubleClickHandler(useDefaultColumnRenderer(props));
 
 	return (
-		<DefaultGridViewFactory Component={DomainGridView}/>
+		<DefaultGridViewFactory useColumnRenderer={useDomainColumnRenderer}/>
 	);
 };

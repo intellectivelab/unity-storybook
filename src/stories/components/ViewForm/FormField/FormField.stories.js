@@ -80,7 +80,7 @@ export const UsingCustomAdornment = () => {
 	]);
 
 	return (
-		<CustomUrlField value="intellective.com"/>
+		<CustomUrlField value="http://intellective.com"/>
 	);
 }
 
@@ -130,6 +130,6 @@ export const UsingCustomInputMask = () => {
 	]);
 
 	return (
-		<PhoneField mask={phoneMask} value="123456789"/>
+		<PhoneField mask={phoneMask} value="123456789" placeholder="123-456-789"/>
 	);
 };

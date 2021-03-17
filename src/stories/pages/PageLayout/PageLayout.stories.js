@@ -79,5 +79,7 @@ export const UsingPageLayout = () => {
 	// Register custom page builder
 	registerBuilder("custom", CustomPageBuilder);
 
-	return <PageContainer builder="custom" href="/api/config/perspectives/storybook/dashboards/page1"/>;
+	return (
+		<PageContainer builder="custom" href="/api/config/perspectives/storybook/dashboards/page1"/>
+	);
 };

@@ -110,34 +110,38 @@ This example shows how to customize the default Grid View component by adding cu
 
 ### Steps
 
-Implement a custom rendering function for the specific column.
+Implement a custom rendering function for the column.
 
 ```jsx
-const renderGender = R.curry((column, value) => {
-	if (R.isEmpty(value) || R.isNil(value)) {
-		return null;
-	}
+const CustomActionRenderer = (props) => {
+	const {column, value, data} = props;
 
-	const color = R.cond([
-		[R.equals("Male"), R.always(amber[500])],
-		[R.equals("Female"), R.always(purple[500])],
-	])(value);
+	const handleClick = (event) => {
+		event.preventDefault();
 
-	return <Avatar style={{color}}>{value.charAt(0)}</Avatar>;
-});
+		alert(value);
+	};
+
+	return (
+		<Box display="flex" flexWrap="noWrap" alignItems="center" justifyContent="center">
+			<Box>
+				<Typography variant="subtitle2">
+					{column.label}
+				</Typography>
+			</Box>
+			<Box mx={2}>
+				<PageviewIcon cursor='pointer' color="inherit" onClick={handleClick}/>
+			</Box>
+		</Box>
+	);
+};
 ```
 
-Let's define a function that will use the rendering function.
+Let's map the custom column renderer to the column configuration
 
 ```jsx
-const useGenderColumnRenderer = (column) => (value, row) => R.compose(renderGender(column), mapValue)(value);
-```
-
-Let's map the custom column renderer.
-
-```jsx
-const useDomainColumnRenderer = R.cond([
-	[R.anyPass([R.propEq('name', 'gender')]), useGenderColumnRenderer],
+const useColumnRenderer = R.cond([
+	[R.propEq('name', 'gender'), R.always(CustomActionRenderer)],
 	[R.T, useDefaultColumnRenderer]
 ]);
 ```
@@ -156,36 +160,32 @@ This example shows how to customize the default grid view component by adding a 
 
 ### Steps
 
-Implement a custom rendering function for the specific column.
+Implement a custom rendering function for the column.
 
 ```jsx
-const useCustomActionRenderer = (column) => (value, row) => {
-	const handleClick = (event) => {
-		event.preventDefault();
+const GenderColumnRenderer = props => {
+	const {value} = props;
 
-		alert("Gender Lookup");
-	};
+	if (R.isEmpty(value) || R.isNil(value)) {
+		return null;
+	}
 
-	return (
-		<Box display="flex" flexWrap="noWrap" alignItems="center" justifyContent="center">
-			<Box>
-				<Typography variant="subtitle2">
-					{column.label}
-				</Typography>
-			</Box>
-			<Box mx={2}>
-				<PageviewIcon cursor='pointer' color="inherit" onClick={handleClick}/>
-			</Box>
-		</Box>
-	);
-};
+	const color = R.cond([
+		[R.equals("Male"), R.always(amber[500])],
+		[R.equals("Female"), R.always(purple[500])],
+	])(value);
+
+	return <Avatar style={{color}}>{value.charAt(0)}</Avatar>;
+}
 ```
 
 Let's map the custom column renderer.
 
 ```jsx
+const isGenderColumn = R.anyPass([R.propEq('name', 'gender')]);
+
 const useDomainColumnRenderer = R.cond([
-	[R.anyPass([R.propEq('name', 'gender')]), useCustomActionRenderer],
+	[isGenderColumn, R.always(GenderColumnRenderer)],
 	[R.T, useDefaultColumnRenderer]
 ]);
 ```
@@ -207,33 +207,23 @@ This example shows how to customize the default GridView component by adding a c
 Create a high-order component that implements cell double-click logic.
 
 ```jsx
-const withCustomCellHandler = R.curry((WrappedGrid, props) => {
-	const findAction = actionName => R.find(R.propEq("name", actionName));
+const withDoubleClickHandler = R.curry((WrappedComponent, props) => {
+	const {data} = props;
 
-	const {id, actions} = props;
+	const action = {type: "view"};
 
 	const dispatch = useDispatch();
 
-	const action = findAction('view')(actions);
+	const onDoubleClickHandler = (e) => {
+		e.preventDefault();
 
-	const useCustomCellRenderer = R.curry((classes, row, column) => {
-
-		const value = row[column.name];
-
-		return (
-			<TableCell key={`${row.id}-${column.name}`}
-			           className={classes.tableCell}
-			           scope="row"
-			           variant="body"
-			           onDoubleClick={() => dispatch(grids.updateGridCurrentAction(id, {action, selected: row}))}
-			>
-				{column.renderer ? column.renderer(value, row, column) : value}
-			</TableCell>
-		);
-	});
+		dispatch(grids.updateGridCurrentAction("usersGrid", {action, selected: data}));
+	};
 
 	return (
-		<WrappedGrid {...props} useCellRenderer={useCustomCellRenderer}/>
+		<span onDoubleClick={onDoubleClickHandler}>
+			<WrappedComponent {...props}/>
+		</span>
 	);
 });
 ```
@@ -241,7 +231,9 @@ const withCustomCellHandler = R.curry((WrappedGrid, props) => {
 Use the component to extend the default grid component.
 
 ```jsx
-const DomainGridView = withCustomCellHandler(GridView);
+const useDomainColumnRenderer = (props) => withDoubleClickHandler(useDefaultColumnRenderer(props));
 
-<DefaultGridViewFactory Component={DomainGridView}/>
+return (
+	<DefaultGridViewFactory useColumnRenderer={useDomainColumnRenderer}/>
+);
 ```

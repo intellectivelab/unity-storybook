@@ -28,7 +28,7 @@ const withSelectedRoot = R.curry((WrappedComponent, props) => {
 			const nodeIds = R.map(R.prop('id'), roots);
 			const paths = R.map(R.prop('path'), roots);
 
-			dispatch(folders.setSelected(id, nodeIds));
+			dispatch(folders.updateSelected(id, nodeIds));
 
 			onNodeSelect && onNodeSelect(nodeIds, paths, R.pick(nodeIds, data));
 		}
