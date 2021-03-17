@@ -10,7 +10,7 @@ import PageviewIcon from '@material-ui/icons/Pageview';
 
 import {amber, purple} from '@material-ui/core/colors';
 
-import {FactoryContextProvider, grids, GridView, useDefaultColumnRenderer, withGridViewConfig, withGridViewDomainActions} from "@intellective/core";
+import {grids, GridView, useDefaultColumnRenderer, withGridViewConfig, withGridViewDomainActions} from "@intellective/core";
 
 export default {title: 'Examples/Components/GridView/Columns'};
 
@@ -72,9 +72,7 @@ export const UsingColumnAction = () => {
 	]);
 
 	return (
-		<FactoryContextProvider>
-			<DefaultGridViewFactory useColumnRenderer={useColumnRenderer}/>
-		</FactoryContextProvider>
+		<DefaultGridViewFactory useColumnRenderer={useColumnRenderer}/>
 	);
 };
 
@@ -106,9 +104,7 @@ export const UsingColumnRenderer = () => {
 	]);
 
 	return (
-		<FactoryContextProvider>
-			<DefaultGridViewFactory useColumnRenderer={useDomainColumnRenderer}/>
-		</FactoryContextProvider>
+		<DefaultGridViewFactory useColumnRenderer={useDomainColumnRenderer}/>
 	);
 };
 
@@ -143,8 +139,6 @@ export const UsingColumnDoubleClick = () => {
 	const useDomainColumnRenderer = (props) => withDoubleClickHandler(useDefaultColumnRenderer(props));
 
 	return (
-		<FactoryContextProvider>
-			<DefaultGridViewFactory useColumnRenderer={useDomainColumnRenderer}/>
-		</FactoryContextProvider>
+		<DefaultGridViewFactory useColumnRenderer={useDomainColumnRenderer}/>
 	);
 };

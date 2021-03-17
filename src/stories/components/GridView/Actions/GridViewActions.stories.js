@@ -349,8 +349,6 @@ export const UsingToolbarAction = () => {
 	});
 
 	return (
-		<FactoryContextProvider>
-			<DefaultGridViewFactory Component={withGridViewPrintAction(GridView)}/>
-		</FactoryContextProvider>
+		<DefaultGridViewFactory Component={withGridViewPrintAction(GridView)}/>
 	);
 };
