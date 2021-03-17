@@ -8,11 +8,9 @@ import {
 	AnalyticsComponentFactory,
 	DefaultChartContainer,
 	DefaultChartFactory,
-	Sunburst,
-	sunburstDataReducer,
 	SunburstRenderer,
 	useChartComponentMapper,
-	useLocalPreferences,
+	useChartPreferences,
 	VerticalPlotChart,
 	withChartConfigLoader,
 	withChartSettings,
@@ -39,7 +37,7 @@ const withSunburstSettings = R.curry((WrappedChart, props) => {
 		{name: 'hovered', label: 'Hovered'}
 	];
 
-	const {preferences, onPreferenceChange} = useLocalPreferences(id);
+	const {preferences, onPreferenceChange} = useChartPreferences(id);
 
 	const ComposedSunburst = useMemo(() => withChartSettings(sunburstSettings)(WrappedChart), []);
 
@@ -56,20 +54,21 @@ const withSunburstSettings = R.curry((WrappedChart, props) => {
 
 export const UsingCustomChartSettings = () => {
 
-	const useDomainChartMapper = R.cond([
-		[R.propEq("type", "sunburst"), R.always(R.pair(withSunburstSettings(Sunburst), sunburstDataReducer(null)))],
-		[R.T, useChartComponentMapper]
-	]);
+	const useDomainChartComponent = props => {
+		const [component, reducer] = useChartComponentMapper(props);
 
-	const withDomainChartMapper = R.curry((WrappedComponent, props) => (
-		<WrappedComponent {...props} component={useDomainChartMapper}/>
-	));
+		const _component = R.when(() => R.propEq("type", "sunburst", props), R.always(withSunburstSettings(component))(component));
+
+		return [_component, reducer];
+	}
+
+	const withDomainChartComponent = R.curry((WrappedComponent, props) => <WrappedComponent {...props} component={useDomainChartComponent}/>);
 
 	/**
 	 *  Customize the default component factory logic with simple boolean condition so that the custom component factory comes first
 	 */
 	const DomainComponentFactory = R.cond([
-		[R.propEq('type', 'chart'), withDomainChartMapper(DefaultChartFactory)],
+		[R.propEq('type', 'chart'), withDomainChartComponent(DefaultChartFactory)],
 		[R.T, AnalyticsComponentFactory]
 	]);
 
