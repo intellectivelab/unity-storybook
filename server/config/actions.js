@@ -118,4 +118,102 @@ module.exports = {
 			}
 		}
 	],
+
+    "usersView01": [
+        {
+            "name": "verify",
+            "label": "Verify",
+            "tooltip": "Verify user details",
+            "type": "custom.verify",
+            "href": "/api/users/verify",
+            "resourceName": 'documents',
+            "_links": {
+                "root": {
+                    "href": "/api/config/actions",
+                    "type": "application/json"
+                },
+                "self": {
+                    "href": "/api/config/actions/verify",
+                    "type": "application/json"
+                },
+            }
+        },
+
+        {
+            "name": "verifyAndClose",
+            "label": "Verify and Close",
+            "tooltip": "Verify user details and close",
+            "type": "custom.verify",
+            "href": "/api/users/verify",
+            "resourceName": 'documents',
+            "_links": {
+                "root": {
+                    "href": "/api/config/actions",
+                    "type": "application/json"
+                },
+                "self": {
+                    "href": "/api/config/actions/verify",
+                    "type": "application/json"
+                },
+            }
+        },
+
+
+        {
+            "name": "checkin",
+            "label": "Check In",
+            "tooltip": "Check In",
+            "type": "checkin",
+            "_links": {
+                "root": {
+                    "href": "/api/config/actions",
+                    "type": "application/json"
+                },
+                "self": {
+                    "href": "/api/config/actions/checkin",
+                    "type": "application/json"
+                },
+                "model": {
+                    "href": "/api/documents",
+                    "type": "application/json"
+                },
+                "view": {
+                    "href": "/api/config/components/documentsCheckin0",
+                    "type": "application/json"
+                }
+            }
+        },
+        {
+            "name": "checkout",
+            "label": "Check Out",
+            "tooltip": "Check Out",
+            "type": "checkout",
+            "_links": {
+                "root": {
+                    "href": "/api/config/actions",
+                    "type": "application/json"
+                },
+                "self": {
+                    "href": "/api/config/actions/checkout",
+                    "type": "application/json"
+                }
+            }
+        },
+        {
+            "name": "cancelCheckOut",
+            "label": "Cancel Check Out",
+            "tooltip": "Cancel Check Out",
+            "type": "cancelCheckOut",
+            "_links": {
+                "root": {
+                    "href": "/api/config/actions",
+                    "type": "application/json"
+                },
+                "self": {
+                    "href": "/api/config/actions/cancelCheckOut",
+                    "type": "application/json"
+                }
+            }
+        }
+    ]
 };
