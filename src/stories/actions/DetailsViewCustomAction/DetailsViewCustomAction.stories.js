@@ -10,7 +10,7 @@ import {
     DomainActionModelCtxt,
     FactoryContextProvider,
     GridView,
-    defaultConfig,
+    defaultActionFactoryConfig,
     parseFormData,
     resources,
     submitRequest,
@@ -90,7 +90,7 @@ export const UsingDetailsViewCustomActions = () => {
     /**
      * Action factory component with redefined FormSubmitHandlerMapper
      */
-    const ActionFactory = new DefaultActionFactory(defaultConfig, DefaultActionMapper, DomainFormSubmitHandlerMapper);
+    const ActionFactory = new DefaultActionFactory(defaultActionFactoryConfig, DefaultActionMapper, DomainFormSubmitHandlerMapper);
 
 
     /**

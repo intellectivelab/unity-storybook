@@ -212,7 +212,7 @@ Define action factory to activate the mapper:
 /**
  * Action factory component with redefined FormSubmitHandlerMapper
  */
-const ActionFactory = new DefaultActionFactory(defaultConfig, DefaultActionMapper, DomainFormSubmitHandlerMapper);
+const ActionFactory = new DefaultActionFactory(defaultActionFactoryConfig, DefaultActionMapper, DomainFormSubmitHandlerMapper);
 ```
 
 Wrap your grid component into the FactoryContext and DomainActionModelCtxt with Domain specific values:
