@@ -1,0 +1,226 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Actions/Details View/README"/>
+
+# Domain Actions Customization Examples
+
+This page shows some samples on how to customize details view with adding custom actions.
+
+## Example - Using action with custom disable logic and submit handler
+
+This example shows how to add actions with custom behaviour to the details view.
+As a sample, 2 different actions will be added:
+
+* `Verify` action.
+The action button will be enabled only if the form data is valid and `age` field has value less or equal to 70.
+* `Verify and Close` action.
+The same to `Verify` action enablement logic plus additionally form data need to be modified to enable the action.
+After clicking on `Verify and Close` button and submitting the request, form will be closed with action result notification.
+
+Both actions send request to the URL specified in the action configuration, in the format below:
+
+```json
+{
+    "ids": ["8c40bcb2-34e4-4e8b-be6f-80bc3b43d787"],
+    "formData": {
+        "country": "CA", "gender": "Male", "firstName": "Bell"
+    }
+}
+```
+
+### Steps
+
+Provide Actions configuration (same should be provided for `Verify and Close` action):
+
+```json
+{
+    "name": "verify",
+    "label": "Verify",
+    "tooltip": "Verify user details",
+    "type": "custom.verify",
+    "href": "/api/users/verify",
+    "resourceName": "documents",
+    "_links": {
+        "root": {
+            "href": "/api/config/actions",
+            "type": "application/json"
+        },
+        "self": {
+            "href": "/api/config/actions/verify",
+            "type": "application/json"
+        }
+    }
+}
+```
+
+Implement Domain Action model logic by extending the default model. Below is list of available functions to extend:
+
+```js
+function DefaultDomainActionModel() {
+	/*
+		Returns true for actions that should be executed only once and closed right away.
+	*/
+	this.isOneTimeAction = R.curry((action) => true);
+
+	/*
+		Returns true for those actions which are static and has no dependency on the state or the model
+	*/
+	this.isStaticAction = R.curry((resourceName, action) => true);
+
+	/*
+		Returns true for those actions which depend on the current resource state and need to be re-validated by making a server call
+	*/
+	this.isDynamicAction = R.curry((resourceName, action) => true);
+
+	/*
+		Returns true for those actions which are suppose to create the resource, e.g. a document or a case
+	*/
+	this.isModelAction = R.curry((action) => true);
+
+	/*
+		Returns true for those actions which are suppose to interact with Office AddOn
+	*/
+	this.isOfficeAddInAction = R.curry((resourceName, action) => true);
+
+	/*
+		Returns true when a grid action supports drag and drop to the grid;
+	*/
+	this.isDragAndDropAction = R.curry((resourceName, action) => true);
+
+	/*
+		Returns true if action supports Drag and Drop files into a grid;
+	*/
+	this.isDragAndDropToFolderAction = R.curry((resourceName, action) => true);
+
+	/*
+		Return true for actions that should be hidden by default.
+	*/
+	this.isHidden = R.curry((action) => true);
+
+	/*
+		This method defines activation logic for the action: when the action should be disabled.
+	*/
+	this.isDisabled = R.curry((action, formState) => true);
+
+	/*
+		Returns the action link which is supposed to be used for executing the action.
+		The link can be taken either from the resource links or from the action links
+	*/
+	this.getActionLink = R.curry((action, objLinks) => action.link);
+
+	/*
+		Returns the resource self link for fetching resource data
+	*/
+	this.getModelLink = R.curry((action, objLinks) => action.modelLink);
+
+	/*
+		Returns the view link for fetching domain view configuration if any linked to the action
+	*/
+	this.getViewLink = R.curry((action, objLinks) => action.viewLink);
+}
+```
+
+Let's define domain logic for `Verify` and `Verify and Close` actions by overriding
+`getActionLink`, `isOneTimeAction` and `isDisabledOriginal` original functions of `DefaultDomainActionModel`:
+
+```js
+
+/**
+ * Condition to detect Verify action
+ */
+const isVerifyAction = R.allPass([R.propEq('type', 'custom.verify')]);
+
+/**
+ * Condition to detect that Verify action should be executed only once and the form to be closed right away.
+ */
+const isVerifyOneTimeAction = R.allPass([
+    R.propEq('type', 'custom.verify'),
+    R.propEq('name', 'verifyAndClose'),
+]);
+
+/**
+ * Custom domain action model. It extends DefaultDomainActionModel with override functions for Verify action logic
+ */
+function DomainActionModel() {
+    DefaultDomainActionModel.call(this);
+
+    const getActionLinkOriginal = this.getActionLink,
+        isOneTimeActionOriginal = this.isOneTimeAction,
+        isDisabledOriginal = this.isDisabled;
+
+    this.getActionLink = R.curry((action, objLinks) => {
+        return R.cond([
+            [isVerifyAction, R.always(action.href)],
+            [R.T, R.always(getActionLinkOriginal(action, objLinks))]
+        ])(action);
+    });
+
+    this.isOneTimeAction = R.curry((action) => R.cond([
+        [isVerifyOneTimeAction, R.always(true)],
+        [R.T, isOneTimeActionOriginal]
+    ])(action));
+
+    this.isDisabled = R.curry((action, formState) => {
+
+        const {data = {}} = formState;
+        const values = R.values(data);
+
+        const isOlder70 = R.pathSatisfies(R.lt(70), ["age", "value"], data);
+        const invalid = R.reduce((acc, value) => acc || Boolean(value.invalid), false, values);
+        const notUpdated = R.not(R.any(value => value.updated === true)(values));
+
+        return R.cond([
+            [isVerifyOneTimeAction, R.always(notUpdated || isOlder70 || invalid)],
+            [isVerifyAction, R.always(isOlder70 || invalid)],
+            [R.T, R.always(isDisabledOriginal(action, formState))]
+        ])(action);
+    });
+}
+```
+Let's also define Custom Form Submit Handler for the actions:
+
+```js
+/**
+ * Custom form submit handler for Verify action. It sends form data along with records id
+ */
+const VerifyFormSubmitHandler = (props) => {
+    const {actionLink, data, fields = {}} = props;
+
+    const parsedFormData = parseFormData(data, fields);
+
+    const payload = {ids: [parsedFormData.id], formData: parsedFormData};
+
+    return actionLink && submitRequest(actionLink, payload, 'POST');
+};
+```
+
+Add mapping for `VerifyFormSubmitHandler`
+
+```jsx 
+/**
+ * Customized form submit handler mapper with Verify action condition added
+ */
+const DomainFormSubmitHandlerMapper = R.cond([
+    [isVerifyAction, R.always(VerifyFormSubmitHandler)],
+    [R.T, DefaultFormSubmitHandlerMapper]
+]);
+``` 
+
+Define action factory to activate the mapper:
+
+```js
+/**
+ * Action factory component with redefined FormSubmitHandlerMapper
+ */
+const ActionFactory = new DefaultActionFactory(defaultActionFactoryConfig, DefaultActionMapper, DomainFormSubmitHandlerMapper);
+```
+
+Wrap your grid component into the FactoryContext and DomainActionModelCtxt with Domain specific values:
+
+```jsx
+<FactoryContextProvider ActionFactory={ActionFactory}>
+    <DomainActionModelCtxt.Provider value={new DomainActionModel()}>
+        <GridViewFactory/>
+    </DomainActionModelCtxt.Provider>
+</FactoryContextProvider>
+```
