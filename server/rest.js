@@ -6,6 +6,7 @@ const domainConfig = require("./config");
 
 const config = R.mergeDeepRight(unityApiMocks.defaultConfig, domainConfig);
 
+const formsApi = require("./api/formsApi");
 const usersApi = require("./api/usersApi");
 
 module.exports = function (app) {
@@ -21,5 +22,6 @@ module.exports = function (app) {
 	unityApiMocks.casesApi(app, config);
 	unityApiMocks.foldersApi(app, config);
 	unityApiMocks.selectorsApi(app, config);
+	formsApi(app);
 	usersApi(app);
 };
