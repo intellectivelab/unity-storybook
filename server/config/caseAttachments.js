@@ -73,7 +73,7 @@ module.exports = {
                 "type": "application/json"
             },
             "actions": {
-                "href": "/api/config/grids/usersGrid/actions",
+                "href": "/api/config/grids/usersAsAttachmentsGrid/actions",
                 "type": "application/json"
             }
         }

@@ -7,6 +7,7 @@ import * as R from "ramda";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 
 import {
+	AttachDocumentAction,
 	CreateCaseDetailsPage,
 	CreateCasePreviewPage,
 	CreateResourceViewTitle,
@@ -143,12 +144,31 @@ export const UsingCustomWizardStep = () => {
 		ViewForm: ResourceWizard
 	}, () => null);
 
+
+	/**
+	 * Uses predefined case subfolder context. Here it is hardcoded, but can be fetched in the real world scenario
+	 * @param props
+	 */
+	const useCaseFolderCtxt = (props) => {
+		// fetch context of the case from the server for example by using /1.0.0/cases/{caseType}/{caseId}/folders API
+		// here it's hardcoded
+		const dummyName = "Sub Folder 1", dummyPath = ["subfolder1"];
+		const dummyFolderCtxDto = {
+			CaseSubFolderPath: "/subfolder1",
+			CaseSubFolderFullPath: "/ICM/cases/case/subfolder1",
+			CaseSubFolderId: "123"
+		};
+
+		return {name: dummyName, value: dummyFolderCtxDto, path: dummyPath};
+	};
+
 	/**
 	 * Custom action mapper with added condition for Create case domain action
 	 */
 	const DomainActionMapper = R.curry((settings = {}, action) => {
 		return R.cond([
 			[D.isCreateCaseAction, R.always(DomainCreateCaseAction(settings))],
+			[D.isAttachNewDocumentAction, R.always(AttachDocumentAction({...settings, useCaseFolderCtxt}))],
 			[R.T, action => DefaultActionMapper(settings, action)],
 		])(action);
 	});
