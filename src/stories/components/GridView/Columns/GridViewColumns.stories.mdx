@@ -237,3 +237,29 @@ return (
 	<DefaultGridViewFactory useColumnRenderer={useDomainColumnRenderer}/>
 );
 ```
+
+## Example - Using view_content action as a link column
+
+By default, the first string default/favorite grid column is used as a link to view details of resource.
+Let's change this behaviour and use view_content action as a link column.
+Note that view_content action must be configured for the grid, check [how to add action to the grid](https://docs.intellectivelab.com/docs/unity-react/configuration/grids/#how-to-add-action-to-the-grid) for details.
+
+### Steps
+
+Create a domain specific useColumnActionType hook. Here we use `fullName` column just as an example.
+
+```jsx
+	const useDomainColumnActionType = R.cond([
+		[(column) => column.name === "fullName", R.always('view_content')],
+	]);
+```
+
+Use the component to extend the default grid component.
+
+```jsx
+
+return (
+	<DefaultGridViewFactory useColumnActionType={useDomainColumnActionType}/>
+);
+```
+
