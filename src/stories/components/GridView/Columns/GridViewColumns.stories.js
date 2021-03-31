@@ -142,3 +142,18 @@ export const UsingColumnDoubleClick = () => {
 		<DefaultGridViewFactory useColumnRenderer={useDomainColumnRenderer}/>
 	);
 };
+
+/*
+Use view_content action as a link column
+ */
+export const UsingViewContentLinkColumn = () => {
+
+	const useDomainColumnActionType = R.cond([
+		[(column) => column.name === "fullName", R.always('view_content')],
+	]);
+
+	return (
+		<DefaultGridViewFactory useColumnActionType={useDomainColumnActionType}/>
+	);
+
+}
