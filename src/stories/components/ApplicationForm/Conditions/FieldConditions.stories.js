@@ -10,14 +10,14 @@ import {
 	DefaultFormFieldFactory,
 	DefaultThemeProvider,
 	FactoryContextProvider,
+	forms,
 	OneColumnLayout,
-	useDefaultFormFieldConditions,
-	forms
+	useDefaultFormFieldConditions
 } from "@intellective/core";
 
 import {ApplicationFieldFactory, ViewApplicationAction} from "@intellective/forms";
 
-export default {title: 'Examples/Components/Application Form/Conditions'};
+export default {title: 'Examples/Components/Application Form/Field Conditions'};
 
 const settings = {
 	variant: 'dialog',
@@ -74,9 +74,7 @@ const useDomainFormFieldConditions = (field) => {
 
 	const _field = useDefaultFormFieldConditions(field);
 
-	useConditionalDefaultValue(_field, useWasteTypesCondition);
-
-	return _field;
+	return useConditionalDefaultValue(_field, useWasteTypesCondition);
 };
 
 const resourceData = {
@@ -103,7 +101,7 @@ const DomainFormFieldFactory = (field) => ApplicationFieldFactory(field) || Defa
 /*
 * Add custom form field rendering conditions
 */
-export const UsingAdvancedFieldConditions = () => {
+export const UsingDomainFieldConditions = () => {
 
 	const ViewAction = ViewApplicationAction({...settings, Layout: OneColumnLayout});
 
@@ -117,10 +115,10 @@ export const UsingAdvancedFieldConditions = () => {
 				<Router>
 					<Dashboard layout={false}>
 						<ViewAction action={action}
-									formId="application_form"
-									resourceData={resourceData}
-									selected={resourceData}
-									useFieldConditions={useDomainFormFieldConditions}/>
+						            formId="application_form"
+						            resourceData={resourceData}
+						            selected={resourceData}
+						            useFieldConditions={useDomainFormFieldConditions}/>
 					</Dashboard>
 				</Router>
 			</FactoryContextProvider>
