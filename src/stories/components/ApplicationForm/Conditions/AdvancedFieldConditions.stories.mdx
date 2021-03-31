@@ -1,0 +1,90 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Components/Application Form/Conditions/README"/>
+
+# Application Form Usage Example
+
+This page provides various examples of using and customizing the Application Forms.
+To use Application Forms instead of default View Forms:
+add import
+```jsx
+import {CreateApplicationAction, ViewApplicationAction} from "@intellective/forms";
+```
+
+map CreateApplicationAction to create case action
+map ViewApplicationAction to view/edit case action
+
+<br/>
+
+## Example - Advanced conditions
+
+This example shows how to a set different values as default for input field based on condition.
+
+### Steps
+
+Override default form field conditions logic. Pass useFieldConditions={useDomainFormFieldConditions} to ViewApplicationAction.
+
+Implement useDomainFormFieldConditions hook
+
+```jsx
+const useDomainFormFieldConditions = (field) => {
+
+	const _field = useDefaultFormFieldConditions(field);
+
+	useConditionalDefaultValue(_field, useWasteTypesCondition);
+
+	return _field;
+};
+```
+
+Create hook useConditionalDefaultValue which will dispatch updated value if needed.
+
+```jsx
+const useConditionalDefaultValue = (field, useFieldCondition) => {
+	const {id, formId} = field;
+
+	const dispatch = useDispatch();
+
+	const {shouldUpdate, value} = useFieldCondition(field);
+
+	useEffect(() => {
+		if (shouldUpdate) {
+			if (value === undefined) {
+				dispatch(forms.omitField(formId, id));
+			} else {
+				dispatch(forms.updateFieldValue(formId, id, value));
+			}
+		}
+	}, [shouldUpdate, value]);
+
+	return field;
+};
+```
+
+Implement condition for each of the fields which depends on other field's value. In this example "wasteTypes" depends on "Permit Type".
+```jsx
+const useWasteTypesCondition = (field) => {
+	const {id, formId} = field;
+
+	const formData = useSelector(R.pathOr({}, ["forms", formId, "data"]));
+
+	const isWasteTransportationApplication = formData["EP_EnvIntTypeCode"]?.value === 'A-TR';
+
+	if (id === "wasteTypes" && isWasteTransportationApplication) {
+		const permitType = formData["Permit Type"]?.value;
+		const wasteTypes = formData[id]?.value;
+		if (permitType === "BiomedicalWasteTransporter") {
+			if (wasteTypes !== "BiomedicalWaste") {
+				return {shouldUpdate: true, value: "BiomedicalWaste"};
+			}
+		} else {
+			if (wasteTypes === "BiomedicalWaste") {
+				return {shouldUpdate: true};
+			}
+		}
+	}
+	return {shouldUpdate: false};
+};
+```
+
+Try to change value of "Permit Type" in Part II and "Waste Types" in Part IV
