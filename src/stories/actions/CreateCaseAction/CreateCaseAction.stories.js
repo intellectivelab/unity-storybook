@@ -7,27 +7,28 @@ import * as R from "ramda";
 import AttachFileIcon from "@material-ui/icons/AttachFile";
 
 import {
-	AttachDocumentAction,
-	CreateCaseDetailsPage,
-	CreateCasePreviewPage,
-	CreateResourceViewTitle,
-	CurrentActionCtxt as CurrentAction,
-	DefaultActionFactory,
-	DefaultActionMapper,
-	FactoryContextProvider,
-	GridView,
-	parseFormData,
-	resources as D,
-	ResourceViewSkeleton,
-	ResourceWizard,
-	SearchTemplate,
-	TabContainer,
-	TwoColumnsLayout,
-	useResourceViewLoader,
-	withActionView,
-	withGridViewConfig,
-	withGridViewDomainActions,
-	withResourceViewTabTemplates
+    AttachDocumentAction,
+    CreateCaseDetailsPage,
+    CreateCasePreviewPage,
+    CreateResourceViewTitle,
+    CurrentActionCtxt as CurrentAction,
+	Dashboard,
+    DefaultActionFactory,
+    DefaultActionMapper,
+    FactoryContextProvider,
+    GridView,
+    parseFormData,
+    resources as D,
+    ResourceViewSkeleton,
+    ResourceWizard,
+    SearchTemplate,
+    TabContainer,
+    TwoColumnsLayout,
+    useResourceViewLoader,
+    withActionView,
+    withGridViewConfig,
+    withGridViewDomainActions,
+    withResourceViewTabTemplates
 } from "@intellective/core";
 
 export default {title: 'Examples/Actions/Create Case'};
@@ -180,7 +181,9 @@ export const UsingCustomWizardStep = () => {
 
 	return (
 		<FactoryContextProvider ActionFactory={ActionFactory}>
-			<GridViewFactory/>
+            <Dashboard layout={false}>
+			    <GridViewFactory/>
+            </Dashboard>
 		</FactoryContextProvider>
 	);
 };
