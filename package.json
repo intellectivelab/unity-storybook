@@ -8,9 +8,9 @@
     "build-storybook": "build-storybook -s public"
   },
   "dependencies": {
-    "@intellective/core": "2021.1.0-alpha.57",
-    "@intellective/forms": "2021.1.0-alpha.12",
     "@intellective/analytics": "2021.1.0-alpha.5",
+    "@intellective/core": "2021.1.0-alpha.61",
+    "@intellective/forms": "2021.1.0-alpha.12",
     "@material-ui/core": "^4.11.3",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.57",
