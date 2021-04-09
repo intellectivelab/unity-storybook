@@ -80,8 +80,8 @@ const useDomainFormFieldConditions = (field) => {
 const resourceData = {
 	caseId: 1000,
 	formConfigId: 1000,
-	EP_Status: {
-		value: "Draft"
+	fields: {
+		EP_Status: "Draft"
 	},
 	_links: {
 		self: {
