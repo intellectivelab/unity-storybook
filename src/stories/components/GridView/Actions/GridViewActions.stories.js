@@ -27,8 +27,8 @@ import {
 	submitRequest,
 	TwoColumnsLayout,
 	withActionBackdrop,
+	withActionSubmit,
 	withActionView,
-	withFormSubmitAction,
 	withGridViewConfig,
 	withGridViewDomainActions,
 } from "@intellective/core";
@@ -136,7 +136,7 @@ export const UsingBulkAction = () => {
 		...props,
 		title: "Verify",
 		submitLabel: "Verify",
-		ViewForm: R.compose(withFormCleanup, withFormSubmitAction)(DefaultViewForm),
+		ViewForm: R.compose(withFormCleanup, withActionSubmit)(DefaultViewForm),
 		viewLinkFn: ({_links: actionLinks}, objLinks) => getLinkByRel(objLinks, 'view') || getLinkByRel(actionLinks, 'view'),
 	}, withActionBackdrop(VerifyHeadlessBulkAction));
 
@@ -280,7 +280,7 @@ export const UsingActionViewForm = () => {
 		...props,
 		title: "Verify",
 		submitLabel: "Verify",
-		ViewForm: R.compose(withFormSubmitAction, withStyles(styles))(VerifyViewForm),
+		ViewForm: R.compose(withActionSubmit, withStyles(styles))(VerifyViewForm),
 	}, () => null);
 
 	/**

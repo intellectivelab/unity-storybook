@@ -4,7 +4,7 @@ import * as R from "ramda";
 
 import {useDispatch} from "react-redux";
 
-import {DefaultComponentFactory, FactoryContextProvider, folders, FolderTreeView, withSnackbar, withTreeQueryLoader} from "@intellective/core";
+import {DefaultComponentFactory, FactoryContextProvider, folders, FolderTreeView, withSnackbar} from "@intellective/core";
 
 import PageContainer from "../../../components/PageContainer/PageContainer";
 
@@ -47,7 +47,7 @@ export const SelectRootByDefault = () => {
 
 		const {Component = FolderTreeView, _links = {}, ...otherProps} = props;
 
-		const ComposedFolderTreeView = R.compose(withSnackbar, withTreeQueryLoader, withSelectedRoot)(Component);
+		const ComposedFolderTreeView = R.compose(withSnackbar, withSelectedRoot)(Component);
 
 		return (
 			<ComposedFolderTreeView {...otherProps} browseLink={_links.browse}/>

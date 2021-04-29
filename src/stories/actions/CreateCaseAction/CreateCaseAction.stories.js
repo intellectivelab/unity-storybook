@@ -22,7 +22,7 @@ import {
     ResourceViewSkeleton,
     ResourceWizard,
     SearchTemplate,
-    TabContainer,
+    TabList,
     TwoColumnsLayout,
     useResourceViewLoader,
     withActionView,
@@ -112,7 +112,7 @@ export const UsingCustomWizardStep = () => {
 		return (
 			<CurrentAction.Provider value={{...currentAction, selected: {...payload, _links}}}>
 				{attachmentsTabs.length > 1
-					? <TabContainer components={attachmentsTabs} renderer={tabRenderer} scrollableRef={scrollableRef}/>
+					? <TabList components={attachmentsTabs} renderer={tabRenderer} scrollableRef={scrollableRef}/>
 					: tabRenderer(attachmentsTabs[0])}
 			</CurrentAction.Provider>
 		);
