@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {useContext} from 'react';
 
-import {useSelector} from "react-redux";
+import {useSelector, useDispatch} from "react-redux";
 
 import * as R from "ramda";
 
@@ -13,9 +13,11 @@ import {
     CreateResourceViewTitle,
     CurrentActionCtxt as CurrentAction,
 	Dashboard,
+	DomainActionModelCtxt,
     DefaultActionFactory,
     DefaultActionMapper,
     FactoryContextProvider,
+	forms,
     GridView,
     parseFormData,
     resources as D,
@@ -65,10 +67,32 @@ const defaultSettings = {
 	Layout: TwoColumnsLayout
 };
 
+const withDefaultValues = R.curry((WrappedAction, props) => {
+ 
+	const {name: formId, onDataLoad = R.identity} = props;
+  
+	const dispatch = useDispatch();
+  
+	const currentActionContext = useContext(CurrentAction); // current action is attach new document to the case
+	console.log("currentActionContext, ",currentActionContext);
+	const parentAction = currentActionContext.parentAction; // view case action with the case data in selected property
+	const value = R.path(["selected", "id"], parentAction); //take value of id field as an example
+
+	const fieldId = "fullName";
+  
+	const onDataLoadHandler = (data) => {
+	   value && dispatch(forms.updateFieldState(formId, fieldId, {value, invalid: false, errorText: undefined}));
+	   return onDataLoad(data);
+	};
+  
+	return <WrappedAction {...props} onDataLoad={onDataLoadHandler}/>;
+ });
+
+
 /*
 * Using customized create action
 */
-export const UsingCustomWizardStep = () => {
+export const UsingAttachDocumentAction = () => {
 	/**
 	 * Customized View for Attachments step
 	 */
@@ -169,7 +193,7 @@ export const UsingCustomWizardStep = () => {
 	const DomainActionMapper = R.curry((settings = {}, action) => {
 		return R.cond([
 			[D.isCreateCaseAction, R.always(DomainCreateCaseAction(settings))],
-			[D.isAttachNewDocumentAction, R.always(AttachDocumentAction({...settings, useCaseFolderCtxt}))],
+			[D.isAttachNewDocumentAction, R.always(withDefaultValues(AttachDocumentAction(settings)))],
 			[R.T, action => DefaultActionMapper(settings, action)],
 		])(action);
 	});
