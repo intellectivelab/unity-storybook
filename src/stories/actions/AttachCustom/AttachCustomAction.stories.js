@@ -8,6 +8,7 @@ import AttachFileIcon from "@material-ui/icons/AttachFile";
 
 import {
     AttachDocumentAction,
+	ActionModelCtxt,
     CreateCaseDetailsPage,
     CreateCasePreviewPage,
     CreateResourceViewTitle,
@@ -68,17 +69,25 @@ const defaultSettings = {
 };
 
 const withDefaultValues = R.curry((WrappedAction, props) => {
- 
-	const {name: formId, onDataLoad = R.identity} = props;
+
+	const {action, onDataLoad = R.identity, selected} = props;
+	const {_links} = selected;
+
+	const actionModel = useContext(ActionModelCtxt);
+	const currentActionContext = useContext(CurrentAction); // current action is attach new document to the case
+
+	const {getActionLink} = actionModel;
+
+	const actionLink = R.defaultTo(action.href)(getActionLink(action, _links));
+
+	const formId = actionLink || action.name;
   
 	const dispatch = useDispatch();
   
-	const currentActionContext = useContext(CurrentAction); // current action is attach new document to the case
-	console.log("currentActionContext, ",currentActionContext);
 	const parentAction = currentActionContext.parentAction; // view case action with the case data in selected property
 	const value = R.path(["selected", "id"], parentAction); //take value of id field as an example
 
-	const fieldId = "fullName";
+	const fieldId = "fullName";//as an example of one default field to write to from existing properties.
   
 	const onDataLoadHandler = (data) => {
 	   value && dispatch(forms.updateFieldState(formId, fieldId, {value, invalid: false, errorText: undefined}));
