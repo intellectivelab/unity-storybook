@@ -70,14 +70,20 @@ const withDefaultValues = R.curry((WrappedAction, props) => {
   
 	const dispatch = useDispatch();
   
-	const parentAction = currentActionContext.parentAction; // view case action with the case data in selected property
-	const value = R.path(["selected", "id"], parentAction); //take value of id field as an example
-
-	const fieldId = "fullName";//as an example of one default field to write to from existing properties.
-  
 	const onDataLoadHandler = (data) => {
-	   value && dispatch(forms.updateFieldState(formId, fieldId, {value, invalid: false, errorText: undefined}));
-	   return onDataLoad(data);
+		const updateFields = data.data;
+
+		//set a default value (not from exisiting properites)
+		updateFields.companyName.value = "Intellective";
+	
+		//set a value from the case's existing properities.
+		//this will use the case id as the name on the Attach Document page
+		const parentAction = currentActionContext.parentAction; // view case action with the case data in selected property
+		updateFields.fullName.value = R.path(["selected", "id"], parentAction); //take value of id field as an example
+	  
+		//update the form with the default values
+		dispatch(forms.updateFormState(formId, {data: updateFields}));
+		return onDataLoad(data);
 	};
   
 	return <WrappedAction {...props} onDataLoad={onDataLoadHandler}/>;
