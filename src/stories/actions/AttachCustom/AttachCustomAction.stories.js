@@ -20,7 +20,7 @@ import {
     withGridViewDomainActions,
 } from "@intellective/core";
 
-export default {title: 'Examples/Actions/Attach Custom'};
+export default {title: 'Examples/Actions/Attach With Default Fields'};
 
 const GridViewFactory = (props) => {
 
@@ -93,7 +93,7 @@ const withDefaultValues = R.curry((WrappedAction, props) => {
 /*
 * Using customized create action
 */
-export const UsingAttachDocumentAction = () => {
+export const UsingDefaultFieldsInAttachDocumentAction = () => {
 
 	/**
 	 * Custom action mapper with added condition for Create case domain action
