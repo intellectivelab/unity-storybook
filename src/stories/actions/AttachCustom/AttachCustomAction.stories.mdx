@@ -2,290 +2,62 @@ import {Meta} from '@storybook/addon-docs/blocks';
 
 <Meta title="Examples/Actions/Attach With Default Fields/README"/>
 
-# Attach Action Customization Example
+# Attach Action With Default Field Values Example
 
-This page shows various ways of customizing the default implementation of various Unity actions.
+This page shows how to populate a field on the document attach page with either a default value or a value from the exisiting case properites.
 
-## Example - Using custom create case action
+### Configuration
 
-This example shows how to customize a wizard step for the CreateCase action.
+This example relies on the same configurations as the `Create Case` story.
 
-### Steps
-
-We're going to modify `Attachments` step for the CreateCase action.
-
-Let's define action configuration:
-
-```json
-{
-    "name": "createCase",
-    "label": "Create",
-    "tooltip": "Create new case",
-    "type": "create",
-    "resourceName": "cases",
-    "_links": {
-        "root": {
-            "href": "/api/config/actions",
-            "type": "application/json"
-        },
-        "self": {
-            "href": "/api/config/actions/createCase",
-            "type": "application/json"
-        },
-        "model": {
-            "href": "/api/casetasks",
-            "type": "application/json"
-        },
-        "view": {
-            "href": "/api/config/components/CustomCaseView",
-            "type": "application/json"
-        }
-    }
- }
-```
-
-Let's define customCaseView component configuration, that is used as a view for `CreateCase` action:
-
-```json
-{
-    "id": "CustomCaseView",
-    "resourceName": "documents",
-    "resourceType": "DomainCase",
-    "viewType": "Create",
-    "tabs": [
-        {
-            "id": "1",
-            "title": "Details",
-            "tooltip": "Case Details",
-            "type": "Details",
-            "fieldSetId": "CustomCaseViewFieldset",
-            "_links": {
-                "root": {
-                    "href": "/api/config/components/CustomCaseView",
-                    "type": "application/json"
-                },
-                "self": {
-                    "href": "/api/config/components/CustomCaseView/tabs/1",
-                    "type": "application/json"
-                },
-                "actions": {
-                    "href": "/api/config/components/CustomCaseView/tabs/1/actions",
-                    "type": "application/json"
-                },
-                "fieldset": {
-                    "href": "/api/config/components/CustomCaseViewFieldset",
-                    "type": "application/json"
-                }
-            }
-        },
-        {
-            "id": "2",
-            "title": "Documents",
-            "tooltip": "Case Documents",
-            "type": "Attachments",
-            "_links": {
-                "root": {
-                    "href": "/api/config/components/CustomCaseView",
-                    "type": "application/json"
-                },
-                "self": {
-                    "href": "/api/config/components/CustomCaseView/tabs/2",
-                    "type": "application/json"
-                },
-                "actions": {
-                    "href": "/api/config/components/CustomCaseView/tabs/2/actions",
-                    "type": "application/json"
-                },
-                "templates": {
-                    "href": "/api/config/components/CustomCaseView/templates",
-                    "type": "application/json"
-                }
-            }
-        }
-    ]
-}
-```
-
-The configuration consist of 2 tabs: Details and Attachments. By default, only Details tab is taken into consideration when
-rendering the action view. It's displayed on Wizard's 1st step. Two other steps use configuration of Details and
-Attachments tabs specified for `view` action.
-
-Let's change the default behaviour and use not `view`, but `create` action Attachments tab configuration for the 3rd step.
-It allows to have a different set of search templates for case attachments.
-
-Let's use the following grid configuration for the case attachments search template:
-
-```json
-{
-    "id": "CustomCaseAttachmentsGrid",
-    "title": "New Complaint Users",
-    "ui": "infinite",
-    "columns": [
-        {
-            "name": "id",
-            "label": "Id",
-            "dataType": "string",
-            "width": 100,
-            "multiValue": false,
-            "tooltip": "",
-            "sortable": false,
-            "resizable": false
-        },
-        {
-            "name": "fullName",
-            "label": "Name",
-            "dataType": "string",
-            "width": 200,
-            "tooltip": "",
-            "sortable": true,
-            "resizable": true,
-            "header": "Personal Info"
-        },
-        {
-            "name": "gender",
-            "label": "Gender",
-            "dataType": "string",
-            "width": 100,
-            "tooltip": "",
-            "sortable": true,
-            "resizable": true,
-            "header": "Personal Info"
-        }
-    ],
-    "favorite": ["fullName"],
-    "default": ["fullName", "gender"],
-    "sorting": [
-        {
-            "column": "fullName",
-            "direction": "ASC"
-        }
-    ],
-    "_links": {
-        "self": {
-            "href": "/api/config/components/CustomCaseAttachmentsGrid",
-            "type": "application/json"
-        },
-        "actions": {
-            "href": "/api/config/grids/CustomCaseAttachmentsGrid/actions",
-            "type": "application/json"
-        }
-    }
-}
-```
-
-Let's define a view for the `Attachments` step:
+Let's define custom field setting for the `Attachments` step:
 
 ```jsx 
-const CaseAttachmentsTemplates = withResourceViewTabTemplates(SearchTemplate);
+const withDefaultValues = R.curry((WrappedAction, props) => {
 
-const CaseAttachmentsView = (props) => {
-	const {formId, currentAction = {}, scrollableRef, onError, action} = props;
+	const {action, onDataLoad = R.identity, selected} = props;
+	const {_links} = selected;
 
-	const formState = useSelector(R.pathOr({}, ["forms", formId]));
+	const actionModel = useContext(ActionModelCtxt);
+	const currentActionContext = useContext(CurrentAction); // current action is attach new document to the case
 
-	const {data, objLinks: _links} = formState;
+	const {getActionLink} = actionModel;
 
-	const payload = parseFormData(data);
+	const actionLink = R.defaultTo(action.href)(getActionLink(action, _links));
 
-	const {status, data: view = {}, error} = useResourceViewLoader(R.path(["_links", "view", "href"], action));
+	const formId = actionLink || action.name;
+  
+	const dispatch = useDispatch();
+  
+	const onDataLoadHandler = (data) => {
+		const updateFields = data.data;
 
-	if (status === "loading") {
-		return (
-			<div style={{marginTop: "24px"}}>
-				<ResourceViewSkeleton/>
-			</div>
-		);
-	}
+		//set a default value (not from exisiting properites)
+		if (updateFields.companyName) updateFields.companyName.value = "Intellective";
+	
+		//set a value from the case's existing properities.
+		//this will use the case id as the name on the Attach Document page
+		const parentAction = currentActionContext.parentAction; // view case action with the case data in selected property
+		if (updateFields.fullName) updateFields.fullName.value = R.path(["selected", "id"], parentAction); //take value of id field as an example
+	  
+		//update the form with the default values
+		dispatch(forms.updateFormState(formId, {data: updateFields}));
+		return onDataLoad(data);
+	};
+  
+	return <WrappedAction {...props} onDataLoad={onDataLoadHandler}/>;
+ });
 
-	if (status === "failed" && error) {
-		onError && onError(error);
-
-		return (
-			<div style={{marginTop: "24px"}}>
-				<ResourceViewSkeleton/>
-			</div>
-		);
-	}
-
-	const tabRenderer = (tab) => <CaseAttachmentsTemplates formId={formId} tab={tab} scrollableRef={scrollableRef} onError={onError}/>;
-
-	const {tabs = []} = view;
-
-	const attachmentsTabs = tabs.filter(tab => tab.type === 'Attachments');
-
-	return (
-		<CurrentAction.Provider value={{...currentAction, selected: {...payload, _links}}}>
-			{attachmentsTabs.length > 1
-				? <TabContainer components={attachmentsTabs} renderer={tabRenderer} scrollableRef={scrollableRef}/>
-				: tabRenderer(attachmentsTabs[0])}
-		</CurrentAction.Provider>
-	);
-};
-```
-CaseAttachmentsView is a copy of CaseAttachments with a difference only in link parameter that useResourceViewLoader uses:
-
-```jsx 
-const {status, data: view = {}, error} = useResourceViewLoader(R.path(["_links", "view", "href"], action));
-``` 
-
-It uses action's `view` link.
-
-Lets' create a custom page for the `Attachments` step:
-
-```jsx
-const CreateCaseAttachmentsPage = {
-	label: 'Attachments',
-	icon: AttachFileIcon,
-	view: CaseAttachmentsView,
-	actions: [
-		{type: 'back'},
-		{type: 'complete', color: 'secondary', variant: 'contained'},
-	]
-};
-```
-
-Now we can define a custom CreateCase action:
-
-```jsx
-const DomainCreateCaseAction = (props) => withActionView({
-	...props,
-	title: <CreateResourceViewTitle resourceName="Case"/>,
-	refreshOnClose: true,
-	pages: R.map(R.when(R.is(Function), R.call), [CreateCaseDetailsPage, CreateCasePreviewPage, CreateCaseAttachmentsPage]),
-	ViewForm: ResourceWizard
-}, () => null);
-```
-
-Additionally, we can change default Attach New Document Action to define a case subfolder to attach documents to.
-In order to do it let's define custom useCaseFolderCtxt hook and pass it into AttachDocumentAction as settings:
-
-```jsx
-/**
- * Uses predefined case subfolder context. Here it is hardcoded, but can be fetched in the real world scenario
- * @param props
- */
-const useCaseFolderCtxt = (props) => {
-    // fetch context of the case from the server for example by using /1.0.0/cases/{caseType}/{caseId}/folders API
-    // here it's hardcoded
-    const dummyName = "Sub Folder 1", dummyPath = ["subfolder1"];
-    const dummyFolderCtxDto = {
-        CaseSubFolderPath: "/subfolder1",
-        CaseSubFolderFullPath: "/ICM/cases/case/subfolder1",
-        CaseSubFolderId: "123"
-    };
-
-    return {name: dummyName, value: dummyFolderCtxDto, path: dummyPath};
-};
 ```
 
 Let's map our custom action by creating a domain action mapper function.
 
 ```jsx
 const DomainActionMapper = R.curry((settings = {}, action) => {
-	return R.cond([
-		[D.isCreateCaseAction, R.always(DomainCreateCaseAction(settings))],
-        [D.isAttachNewDocumentAction, R.always(AttachDocumentAction({...settings, useCaseFolderCtxt}))],
-		[R.T, action => DefaultActionMapper(settings, action)],
-	])(action);
+		return R.cond([
+			[D.isAttachNewDocumentAction, R.always(withDefaultValues(AttachDocumentAction(settings)))],
+			[R.T, action => DefaultActionMapper(settings, action)],
+		])(action);
+	});
 });
 ```
