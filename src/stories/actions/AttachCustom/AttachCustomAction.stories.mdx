@@ -1,0 +1,75 @@
+import {Meta} from '@storybook/addon-docs/blocks';
+
+<Meta title="Examples/Actions/Attach With Default Fields/README"/>
+
+# Attach Action With Default Field Values Example
+
+This page shows how to populate a field on the document attach page with either a default value or a value from the exisiting case properites.
+
+To see this example:
+1. Go to the story on the sidebar. 
+1. Click on the context menu of a case task and click `View Details`.
+1. Click on the `Documents` tab (If there is no documents tab for that case, go back and choose another).
+1. Click `Attach` > `Attach New`.
+1. Attach any file.
+1. You will see the `Name` field is pre-populated with the case id (an existing properity for that case), and the `Company` field is set to Intellective (a default propery which is set in code)
+
+
+### Configuration
+
+This example relies on the same configurations as the `Create Case` story.
+
+Let's define custom field setting for the `Attachments` step:
+
+```jsx 
+const withDefaultValues = R.curry((WrappedAction, props) => {
+
+	const {action, onDataLoad = R.identity, selected} = props;
+	const {_links} = selected;
+
+	const actionModel = useContext(ActionModelCtxt);
+	const currentActionContext = useContext(CurrentAction); // current action is attach new document to the case
+
+	const {getActionLink} = actionModel;
+
+	const actionLink = R.defaultTo(action.href)(getActionLink(action, _links));
+
+	const formId = actionLink || action.name;
+  
+	const dispatch = useDispatch();
+  
+	const onDataLoadHandler = (data) => {
+		const {data: dataFields = {} } = data;
+
+		//set a default value (not from exisiting properites)
+		const updateCompanyName = R.set(R.lensPath(['companyName','value']),'Intellective');
+	
+		//set a value from the case's existing properities.
+		//this will use the case id as the name on the Attach Document page
+		const parentAction = currentActionContext.parentAction; // view case action with the case data in selected property
+		//take value of id field as an example and set it to Full Name
+		const updateFullName = R.set(R.lensPath(['fullName', 'value']), R.path(['selected', 'id'], parentAction));
+
+		const updatedFields = R.compose(updateCompanyName, updateFullName)(dataFields);
+	  
+		//update the form with the default values
+		dispatch(forms.updateFormState(formId, {data: updatedFields}));
+		return onDataLoad(data);
+	};
+  
+	return <WrappedAction {...props} onDataLoad={onDataLoadHandler}/>;
+ });
+
+```
+
+Let's map our custom action by creating a domain action mapper function.
+
+```jsx
+const DomainActionMapper = R.curry((settings = {}, action) => {
+		return R.cond([
+			[D.isAttachNewDocumentAction, R.always(withDefaultValues(AttachDocumentAction(settings)))],
+			[R.T, action => DefaultActionMapper(settings, action)],
+		])(action);
+	});
+});
+```
